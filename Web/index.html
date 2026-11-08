@@ -3,13 +3,14 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>KCI</title>
+<title>KCI - 4/2</title>
 
 <!-- ── PWA: เพิ่มไปหน้าจอหลักได้ทั้ง Android/iOS ── -->
 <link rel="manifest" href="manifest.json"/>
 <meta name="theme-color" id="themeColorMeta" content="#030712"/>
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png"/>
-<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png"/>
+<link rel="icon" type="image/svg+xml" href="app-icon.svg?v=3"/>
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png?v=3"/>
+<link rel="icon" type="image/png" sizes="16x16" href="favicon-16.png?v=3"/>
 <link rel="apple-touch-icon" href="apple-touch-icon.png"/>
 <!-- iOS Safari ไม่อ่าน manifest.json สำหรับโหมด/ไอคอนตอนเพิ่มหน้าจอหลัก ต้องใช้ meta tag ชุดนี้แทน -->
 <meta name="apple-mobile-web-app-capable" content="yes"/>
@@ -38,12 +39,16 @@
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getDatabase,ref,set,get,update,push,onValue,remove}
   from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+import{getAuth,onAuthStateChanged,signInWithCustomToken,signOut,getIdTokenResult}
+  from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import{query,orderByChild,equalTo}
+  from'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
 
 const cfg= window.getSecureConfig();
-
 const fbApp=initializeApp(cfg);
 const db=getDatabase(fbApp);
-window.$db={db,ref,set,get,update,push,onValue,remove};
+const auth=getAuth(fbApp);
+window.$db={db,auth,ref,set,get,update,push,onValue,remove,query,orderByChild,equalTo,onAuthStateChanged,signInWithCustomToken,signOut,getIdTokenResult};
 window.dispatchEvent(new Event('firebase-ready'));
 </script>
 
@@ -75,6 +80,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 #topbar{position:fixed;top:0;left:0;right:0;z-index:100;height:var(--top-h);display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:rgba(3,7,18,0.7);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
 [data-theme="light"] #topbar{background:rgba(248,250,252,0.8)}
 .logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--text);text-decoration:none}
+.logo-brand-icon{display:block;width:24px;height:24px;flex:0 0 24px;object-fit:contain}
 .logo-emoji{font-size:24px}
 .topbar-right{display:flex;align-items:center;gap:10px}
 #themeBtn{width:36px;height:36px;border-radius:50%;background:var(--card);border:1px solid var(--border);color:var(--text2);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .25s ease}
@@ -98,6 +104,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .login-wrap{width:100%;max-width:400px}
 .login-hero{text-align:center;margin-bottom:32px}
 .login-ico{display:inline-flex;align-items:center;justify-content:center;width:80px;height:80px;border-radius:24px;font-size:40px;background:linear-gradient(135deg,rgba(129,140,248,0.15),rgba(34,211,238,0.15));border:1px solid rgba(129,140,248,0.3);margin-bottom:16px;animation:flt 4s ease-in-out infinite}
+.login-brand-icon{display:block;width:72px;height:72px;object-fit:contain}
 @keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .login-hero h1{font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;background:linear-gradient(135deg,var(--text),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .login-hero p{color:var(--text2);font-size:14px;margin-top:6px}
@@ -164,7 +171,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .admin-home-eyebrow{font-size:10px;font-weight:800;letter-spacing:1.2px;color:var(--accent2);text-transform:uppercase}
 .admin-home-hero h2{font-size:20px;line-height:1.25;margin:4px 0}
 .admin-home-hero p{font-size:12px;color:var(--text2);margin:0}
-.admin-home-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.admin-home-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px}
 .admin-home-kpi{min-width:0;padding:16px;border-radius:var(--r-sm);border:1px solid var(--border);background:var(--card);box-shadow:0 8px 24px rgba(0,0,0,.08)}
 .admin-home-kpi-top{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--text2);font-size:11px;font-weight:700}
 .admin-home-kpi-icon{width:30px;height:30px;display:grid;place-items:center;border-radius:10px;background:rgba(129,140,248,.12);color:var(--accent2)}
@@ -199,6 +206,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .admin-home-latest-name{font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .admin-home-latest-meta{font-size:10px;color:var(--muted);margin-top:2px}
 .admin-home-latest-amount{font-size:12px;font-weight:800;color:var(--green);white-space:nowrap}
+@media(max-width:1040px){.admin-home-kpis{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:820px){.admin-home-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-home-columns{grid-template-columns:1fr}}
 @media(max-width:560px){.admin-home-hero{flex-wrap:wrap}.admin-home-hero-copy{flex:1 1 calc(100% - 58px)}.admin-home-hero>.btn{margin-left:58px}}
 @media(max-width:480px){.admin-home-hero{padding:17px 14px;align-items:flex-start}.admin-home-icon{width:42px;height:42px;flex-basis:42px;border-radius:13px}.admin-home-hero h2{font-size:17px}.admin-home-hero .btn{font-size:11px;padding:8px}.admin-home-kpi{padding:13px}.admin-home-kpi-value{font-size:20px}.admin-home-card{padding:15px}}
@@ -264,6 +272,18 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .admin-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
 .admin-panel{display:none}
 .admin-panel.active{display:block;animation:pgIn .25s ease}
+.storage-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0}
+.storage-stat-card{min-width:0;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--card);padding:14px}
+.storage-stat-label{font-size:11px;color:var(--text2);font-weight:700}
+.storage-stat-value{font-size:21px;font-weight:800;margin-top:6px;overflow-wrap:anywhere}
+.storage-backup-row{display:flex;align-items:center;gap:14px;justify-content:space-between;flex-wrap:wrap;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--card);padding:14px 16px;margin:8px 0}
+.storage-backup-info{flex:1;min-width:220px}
+.storage-backup-actions{display:flex;align-items:center;gap:8px}
+.storage-backup-name{font-size:14px;font-weight:700;overflow-wrap:anywhere}
+.storage-backup-meta{font-size:11px;color:var(--text2);margin-top:4px}
+.storage-backup-stats{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.storage-backup-chip{font-size:10px;color:var(--text2);background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:999px;padding:3px 8px}
+@media(max-width:760px){.storage-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.storage-stat-value{font-size:18px}}
 .input-group{margin-bottom:14px}
 .input-group label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:7px}
 .input-group input,.input-group select{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:12px 14px;font-family:inherit;font-size:14px;color:var(--text);outline:none;transition:border-color .2s,box-shadow .2s}
@@ -397,7 +417,11 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 .room-summary-export-shell .rsm-table{width:max-content;min-width:100%}
 .room-summary-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px}
 .room-summary-controls .wallet-select{min-width:0}
-.rsm-legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;color:var(--text2)}
+.rsm-legend{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:12px;font-size:11px;color:var(--text2)}
+.rsm-edit-toggle{margin-left:auto;white-space:nowrap;flex:0 0 auto}
+.rsm-edit-input{width:64px;max-width:100%;padding:5px 3px;border:1px solid var(--border2);border-radius:6px;background:rgba(5,10,20,.55);color:var(--text);font:inherit;font-size:12px;text-align:center;outline:none}
+.rsm-edit-input:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(34,211,238,.16)}
+.rsm-edit-cell{padding:4px!important}
 .summary-month-picker{margin:8px 0 12px;border:1px solid var(--border);border-radius:12px;padding:10px 12px;background:rgba(255,255,255,0.03)}
 .summary-month-picker-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--text2);margin-bottom:8px}
 .summary-month-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -516,9 +540,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
 /* Lucide icon styling */
 .i-lucide{display:inline-block;vertical-align:middle}
-.logo-ico svg{width:24px;height:24px}
 .nav-btn .ico svg{width:22px;height:22px}
-.login-ico svg{width:80px;height:80px}
 .avatar-ico svg{width:100%;height:100%}
 .avatar-emoji{display:flex;align-items:center;justify-content:center;width:100%;height:100%;font-size:18px}
 .avatar-emoji.small{font-size:14px}
@@ -550,8 +572,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 </div>
 
 <header id="topbar">
-  <a class="logo" href="#" onclick="return false">
-    <i data-lucide="school" class="logo-ico"></i>
+  <a class="logo" href="https://kci.xn--12c1bpbba3dcfr1jra8c9bzgl.com/stu/index.php">
+    <img class="logo-brand-icon" src="app-icon.svg?v=4" alt="" aria-hidden="true"/>
     คำชะอีวิทยาคาร
   </a>
   <div class="topbar-right">
@@ -618,7 +640,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 <section id="page-login" class="page active">
   <div class="login-wrap">
     <div class="login-hero">
-      <div class="login-ico"><i data-lucide="school" class="login-ico"></i></div>
+      <div class="login-ico"><img class="login-brand-icon" src="app-icon.svg?v=4" alt="" aria-hidden="true"/></div>
       <h1>4/2 Hub</h1>
       <p>คำชะอีวิทยาคาร · ระบบจัดการห้องเรียน</p>
     </div>
@@ -672,7 +694,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
       </div>
       </div>
       <div class="student-home-columns">
-        <div class="card glass-panel student-home-card">
+        <div class="card glass-panel student-home-card" id="student-home-payment-card">
           <div class="student-home-card-head"><div><div class="student-home-card-title">เงินห้องของฉัน</div><div class="student-home-card-subtitle" id="student-home-payment-period">ประจำเดือนนี้</div></div><i data-lucide="wallet" class="inline-ico"></i></div>
           <div id="student-home-payment-summary"></div>
         </div>
@@ -710,6 +732,10 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
           <div class="admin-home-kpi-value" id="admin-kpi-net">0฿</div><div class="admin-home-kpi-note">หักรายจ่ายและเงินยืมค้างคืน</div>
         </div>
         <div class="admin-home-kpi">
+          <div class="admin-home-kpi-top"><span>การใช้จ่าย</span><span class="admin-home-kpi-icon" style="color:var(--red)"><i data-lucide="trending-down"></i></span></div>
+          <div class="admin-home-kpi-value" id="admin-kpi-expenses" style="color:var(--red)">0฿</div><div class="admin-home-kpi-note">รวมรายจ่ายที่บันทึกไว้ทั้งหมด</div>
+        </div>
+        <div class="admin-home-kpi">
           <div class="admin-home-kpi-top"><span>ยอดเก็บไม่ครบเดือนนี้</span><span class="admin-home-kpi-icon"><i data-lucide="alert-triangle"></i></span></div>
           <div class="admin-home-kpi-value" id="admin-kpi-due" style="color:var(--gold)">0฿</div><div class="admin-home-kpi-note" id="admin-kpi-due-note">0 คน</div>
         </div>
@@ -739,6 +765,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   <div class="pg-header">
     <div class="pg-title">รายชื่อนักเรียน <i data-lucide="users" class="inline-ico"></i></div>
     <div class="pg-sub">ห้อง 4/2 · คำชะอีวิทยาคาร</div>
+    <div id="class-scope-note" style="display:none;font-size:11px;color:var(--text2);margin-top:5px">บัญชีทั่วไปเห็นเฉพาะข้อมูลรายชื่อที่แอดมินอนุญาต โดยไม่แสดงคะแนนหรือข้อมูลติดต่อ</div>
   </div>
   <div class="guest-wall" id="class-guest-wall">
     <i data-lucide="lock" class="gw-ico"></i>
@@ -830,6 +857,9 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <button class="admin-tab" onclick="switchAdminTab('perms')"><i data-lucide="lock" class="inline-ico"></i> สิทธิ์</button>
     <button class="admin-tab" onclick="switchAdminTab('admins')"><i data-lucide="user-check" class="inline-ico"></i> บัญชีแอดมิน</button>
     <button class="admin-tab" onclick="switchAdminTab('cmd')"><i data-lucide="terminal" class="inline-ico"></i> คำสั่ง</button>
+    <button class="admin-tab" onclick="switchAdminTab('storage')"><i data-lucide="database" class="inline-ico"></i> Storage</button>
+    <button class="admin-tab" onclick="switchAdminTab('audit')"><i data-lucide="scroll-text" class="inline-ico"></i> ประวัติแก้ไข</button>
+    <button class="admin-tab" onclick="switchAdminTab('health')"><i data-lucide="heart-pulse" class="inline-ico"></i> สุขภาพระบบ</button>
   </div>
 
   <div class="admin-panel active" id="ap-members">
@@ -848,6 +878,16 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
         </div>
       </div>
       <button class="btn btn-primary" onclick="addMember()"><i data-lucide="plus" class="btn-ico"></i> เพิ่มสมาชิก</button>
+    </div>
+    <div class="card glass-panel" style="margin-top:14px">
+      <div class="section-head"><span class="section-title"><i data-lucide="file-spreadsheet" class="inline-ico"></i> นำเข้า / ส่งออก CSV</span></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px">ส่งออกเปิดด้วย Excel ได้ และนำเข้ารายชื่อได้หลังตรวจรหัสซ้ำกับช่องข้อมูลที่ผิด</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn btn-sm btn-outline" onclick="exportDataCsv('members')"><i data-lucide="download" class="btn-ico"></i> ส่งออกรายชื่อ</button>
+        <button class="btn btn-sm btn-outline" onclick="exportDataCsv('payments')"><i data-lucide="download" class="btn-ico"></i> ส่งออกประวัติเงิน</button>
+      </div>
+      <div class="input-group"><label for="member-csv-file">เลือกไฟล์ CSV รายชื่อ</label><input id="member-csv-file" type="file" accept=".csv,text/csv" onchange="previewMemberCsv(this.files?.[0])"/></div>
+      <div id="member-csv-preview" role="status" style="font-size:12px;color:var(--text2)"></div>
     </div>
     <div class="section-head"><span class="section-title">รายชื่อทั้งหมด</span></div>
     <div class="search-bar" style="margin-bottom:10px">
@@ -869,47 +909,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
   </div>
 
   <div class="admin-panel" id="ap-payment">
-    <div class="card glass-panel" style="margin-bottom:14px">
-      <div class="section-head"><span class="section-title"><i data-lucide="check" class="inline-ico"></i> บันทึกการจ่ายเงิน</span></div>
-      <div class="input-row">
-        <div class="input-group"><label>ปี พ.ศ.</label><input type="number" id="ap-year" value="2569"/></div>
-        <div class="input-group"><label>เดือน</label>
-          <select id="ap-month" onchange="onAdminMonthChange()">
-            <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option>
-            <option value="3">มีนาคม</option><option value="4">เมษายน</option>
-            <option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
-            <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option>
-            <option value="9">กันยายน</option><option value="10">ตุลาคม</option>
-            <option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
-          </select>
-        </div>
-      </div>
-      <div class="input-row">
-        <div class="input-group"><label>สัปดาห์ที่</label>
-          <select id="ap-week" onmousedown="prepareAdminWeekDropdown()" onchange="onAdminWeekChange()">
-            <option value="1">สัปดาห์ที่ 1</option>
-          </select>
-        </div>
-        <div class="input-group"><label>ค่าห้องที่ต้องจ่าย (฿)</label>
-          <input type="number" id="ap-target-fee" readonly style="background:var(--bg2);color:var(--muted)"/>
-        </div>
-      </div>
-      <div class="input-group">
-        <label>รหัสนักเรียน / ค้นหารายชื่อ</label>
-        <div class="hybrid-select-wrapper">
-          <input type="text" id="ap-sid" placeholder="พิมพ์รหัสเอง เช่น 66001" style="width:50%"/>
-          <select id="ap-sid-dropdown" onmousedown="preparePaymentDropdown()" onchange="onAdminStudentDropdownSelect(this.value)" style="width:50%">
-            <option value="">-- กดเพื่อดูรายชื่อที่ยังไม่จ่าย --</option>
-          </select>
-        </div>
-      </div>
-      <div class="input-group">
-        <label>จำนวนเงินที่จ่าย (฿)</label>
-        <input type="number" id="ap-amount" placeholder="20"/>
-      </div>
-      <div class="input-group"><label>หมายเหตุ</label><input type="text" id="ap-note" placeholder="ไม่บังคับ"/></div>
-      <button class="btn btn-success" onclick="addPayment()"><i data-lucide="check" class="btn-ico"></i> บันทึก</button>
-    </div>
     <div class="card glass-panel" style="margin-bottom:14px;margin-top:14px">
       <div class="section-head" style="margin-bottom:12px"><span class="section-title"><i data-lucide="zap" class="inline-ico"></i> เติมเงินอัตโนมัติ</span></div>
       <p style="font-size:12px;color:var(--text2);margin-bottom:14px">ใส่รหัสนักเรียนและจำนวนเงินรวม ระบบจะแบ่งจ่ายแต่ละสัปดาห์ให้อัตโนมัติตามค่าห้องที่ตั้งไว้</p>
@@ -939,7 +938,47 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
         <button class="btn btn-success btn-sm" style="flex:1" onclick="confirmAutoFill()"><i data-lucide="zap" class="btn-ico"></i> เติมเงิน</button>
       </div>
     </div>
-
+    <div class="card glass-panel" style="margin-bottom:14px">
+      <div class="section-head"><span class="section-title"><i data-lucide="check" class="inline-ico"></i> บันทึกการจ่ายเงิน</span></div>
+      <div class="input-row">
+        <div class="input-group"><label>ปี พ.ศ.</label><input type="number" id="ap-year" value="2569" onchange="onAdminMonthChange()"/></div>
+        <div class="input-group"><label>เดือน</label>
+          <select id="ap-month" onchange="onAdminMonthChange()">
+            <option value="1">มกราคม</option><option value="2">กุมภาพันธ์</option>
+            <option value="3">มีนาคม</option><option value="4">เมษายน</option>
+            <option value="5">พฤษภาคม</option><option value="6">มิถุนายน</option>
+            <option value="7">กรกฎาคม</option><option value="8">สิงหาคม</option>
+            <option value="9">กันยายน</option><option value="10">ตุลาคม</option>
+            <option value="11">พฤศจิกายน</option><option value="12">ธันวาคม</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-row">
+        <div class="input-group"><label>สัปดาห์ที่</label>
+          <select id="ap-week" onmousedown="prepareAdminWeekDropdown()" onchange="onAdminWeekChange(true)">
+            <option value="1">สัปดาห์ที่ 1</option>
+          </select>
+        </div>
+        <div class="input-group"><label>ค่าห้องที่ต้องจ่าย (฿)</label>
+          <input type="number" id="ap-target-fee" readonly style="background:var(--bg2);color:var(--muted)"/>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>รหัสนักเรียน / ค้นหารายชื่อ</label>
+        <div class="hybrid-select-wrapper">
+          <input type="text" id="ap-sid" placeholder="พิมพ์รหัสเอง เช่น 66001" style="width:50%"/>
+          <select id="ap-sid-dropdown" onmousedown="preparePaymentDropdown()" onchange="onAdminStudentDropdownSelect(this.value)" style="width:50%">
+            <option value="">-- กดเพื่อดูรายชื่อที่ยังไม่จ่าย --</option>
+          </select>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>จำนวนเงินที่จ่าย (฿)</label>
+        <input type="number" id="ap-amount" placeholder="20"/>
+      </div>
+      <div class="input-group"><label>หมายเหตุ</label><input type="text" id="ap-note" placeholder="ไม่บังคับ"/></div>
+      <button class="btn btn-success" onclick="addPayment()"><i data-lucide="check" class="btn-ico"></i> บันทึก</button>
+    </div>
     <div class="card glass-panel" style="margin-bottom:14px">
       <div class="section-head" style="margin-bottom:8px"><span class="section-title"><i data-lucide="table" class="inline-ico"></i> ตั้งค่าสรุปเงินห้อง</span></div>
       <p style="font-size:12px;color:var(--text2);margin-bottom:4px">กำหนดว่าปุ่ม "สรุปเงินห้อง" จะแสดงสัปดาห์ไหนบ้าง</p>
@@ -980,6 +1019,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
             <span><span class="rsm-swatch rsm-paid"></span>จ่ายครบ</span>
             <span><span class="rsm-swatch rsm-partial"></span>จ่ายไม่ครบ</span>
             <span><span class="rsm-swatch rsm-unpaid"></span>ยังไม่จ่าย</span>
+            <button class="btn btn-sm btn-outline rsm-edit-toggle" id="admin-rsm-edit-btn" type="button" onclick="toggleAdminRoomSummaryEdit()"><i data-lucide="pencil" class="btn-ico"></i> เปิดการแก้ไข</button>
           </div>
           <div id="admin-rsm-totalbar"></div>
           <div id="admin-rsm-body"><span class="loading-spinner"></span></div>
@@ -1132,11 +1172,22 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
 
   <div class="admin-panel" id="ap-perms">
     <div class="card glass-panel">
-      <div class="section-head" style="margin-bottom:8px"><span class="section-title">เมนู Guest</span></div>
-      <p style="font-size:12px;color:var(--text2);margin-bottom:16px">กำหนดว่านักเรียนห้องอื่น (Guest) ดูอะไรได้บ้าง</p>
+      <div class="section-head" style="margin-bottom:8px"><span class="section-title">สิทธิ์ตามยศ</span></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:16px">เลือกยศก่อน แล้วกำหนดเมนูที่สมาชิกยศนั้นเข้าถึงได้ การเปลี่ยนค่านี้ไม่กระทบสิทธิ์ของอีกยศ</p>
+      <div class="input-group" style="max-width:360px;margin-bottom:12px">
+        <label for="perm-role-select">เลือกยศที่ต้องการตั้งค่า</label>
+        <select id="perm-role-select" class="wallet-select" onchange="PERMS_ROLE=this.value;applyPermsUI()">
+          <option value="guest">Guest</option>
+          <option value="student">Student</option>
+        </select>
+      </div>
       <div class="toggle-row">
         <div><div class="t-title"><i data-lucide="users" class="inline-ico"></i> รายชื่อนักเรียน</div><div class="t-sub">แสดงรายชื่อสมาชิกห้อง 4/2</div></div>
         <label class="toggle"><input type="checkbox" id="perm-class" onchange="savePerms()"/><span class="toggle-slider"></span></label>
+      </div>
+      <div class="toggle-row">
+        <div><div class="t-title"><i data-lucide="eye" class="inline-ico"></i> ดูข้อมูลส่วนตัว</div><div class="t-sub">แสดงรหัสนักเรียน เบอร์โทร และคะแนนในรายชื่อและหน้ารายละเอียด</div></div>
+        <label class="toggle"><input type="checkbox" id="perm-personal-data" onchange="savePerms()"/><span class="toggle-slider"></span></label>
       </div>
       <div class="toggle-row">
         <div><div class="t-title"><i data-lucide="dollar-sign" class="inline-ico"></i> ระบบเก็บเงินห้อง</div><div class="t-sub">ดูสถานะการจ่ายเงิน</div></div>
@@ -1220,7 +1271,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
         <div class="cmd-chip" onclick="fillCmd('export members')"><span class="cc-cmd">export members</span><span class="cc-desc">export ข้อมูลสมาชิก JSON</span></div>
         <div class="cmd-chip" onclick="fillCmd('export payments')"><span class="cc-cmd">export payments</span><span class="cc-desc">export ข้อมูลเงิน JSON</span></div>
         <div class="cmd-chip" onclick="fillCmd('summary month ')"><span class="cc-cmd">summary month [เดือน]</span><span class="cc-desc">สรุปเงินห้องรายเดือน</span></div>
-        <div class="cmd-chip" onclick="fillCmd('reset perms')"><span class="cc-cmd">reset perms</span><span class="cc-desc">รีเซ็ตสิทธิ์ Guest ทั้งหมด</span></div>
+        <div class="cmd-chip" onclick="fillCmd('reset perms')"><span class="cc-cmd">reset perms</span><span class="cc-desc">รีเซ็ตสิทธิ์ Guest และ Student</span></div>
         <div class="cmd-chip" onclick="fillCmd('whoami')"><span class="cc-cmd">whoami</span><span class="cc-desc">ดูข้อมูลบัญชีที่ใช้งาน</span></div>
       </div>
     </div>
@@ -1238,6 +1289,43 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
         <input class="term-input" id="term-input" type="text" placeholder="พิมพ์คำสั่ง..." autocomplete="off"/>
         <button class="term-run" onclick="runDbCommand()"><i data-lucide="play" class="inline-ico"></i> RUN</button>
       </div>
+    </div>
+  </div>
+  <div class="admin-panel" id="ap-storage">
+    <div class="card glass-panel" style="margin-bottom:14px">
+      <div class="section-head" style="margin-bottom:8px">
+        <span class="section-title"><i data-lucide="database" class="inline-ico"></i> พื้นที่จัดเก็บและสำรองข้อมูล</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-sm btn-outline" id="storage-refresh-btn" type="button" onclick="refreshStoragePage()"><i data-lucide="refresh-cw" class="btn-ico"></i> รีเฟรช</button>
+          <button class="btn btn-sm btn-primary" id="storage-create-btn" type="button" onclick="createStorageBackup()"><i data-lucide="cloud-upload" class="btn-ico"></i> สำรองตอนนี้</button>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--text2);margin:0">สร้างโปรไฟล์สำรองหลายชุดไว้ใน Realtime Database สำรอง และเลือกโหลดกลับได้</p>
+      <div class="storage-stat-grid" id="storage-stat-grid"></div>
+      <div class="input-row" style="align-items:end;margin-bottom:12px">
+        <div class="input-group" style="margin-bottom:0">
+          <label for="storage-backup-name">ชื่อโปรไฟล์สำรอง (ไม่บังคับ)</label>
+          <input id="storage-backup-name" type="text" maxlength="80" placeholder="เช่น ก่อนแก้ข้อมูลนักเรียน"/>
+        </div>
+      </div>
+      <div id="storage-status" role="status" aria-live="polite" style="font-size:12px;color:var(--text2);min-height:20px;margin:8px 0"></div>
+    </div>
+    <div class="section-head"><span class="section-title">โปรไฟล์สำรองทั้งหมด</span><span id="storage-backup-count" style="font-size:11px;color:var(--text2)"></span></div>
+    <div id="storage-backup-list"><div class="card glass-panel" style="color:var(--text2);font-size:12px">กำลังเชื่อมต่อ RTDB สำรอง…</div></div>
+  </div>
+  <div class="admin-panel" id="ap-audit">
+    <div class="card glass-panel">
+      <div class="section-head"><span class="section-title"><i data-lucide="scroll-text" class="inline-ico"></i> ประวัติการแก้ไข</span><div style="display:flex;gap:8px;align-items:center"><button id="audit-clear-btn" class="btn btn-sm btn-outline" onclick="clearAuditLog()"><i data-lucide="trash-2" class="btn-ico"></i> ล้างประวัติ</button><button class="btn btn-sm btn-outline" onclick="loadAuditLog()"><i data-lucide="refresh-cw" class="btn-ico"></i> รีเฟรช</button></div></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px">บันทึกผู้ดำเนินการ เวลา เส้นทางข้อมูล และค่าก่อน/หลัง โดยเก็บไว้ใน RTDB หลัก</p>
+      <div id="audit-log-status" role="status" style="font-size:12px;color:var(--text2);margin-bottom:10px"></div>
+      <div id="audit-log-list"><div class="empty-state">ยังไม่มีรายการ</div></div>
+    </div>
+  </div>
+  <div class="admin-panel" id="ap-health">
+    <div class="card glass-panel">
+      <div class="section-head"><span class="section-title"><i data-lucide="heart-pulse" class="inline-ico"></i> สุขภาพระบบ</span><button class="btn btn-sm btn-outline" onclick="loadSystemHealth()"><i data-lucide="refresh-cw" class="btn-ico"></i> ตรวจตอนนี้</button></div>
+      <p style="font-size:12px;color:var(--text2);margin-bottom:12px">ตรวจ Node.js API, Firebase RTDB ทั้งสองฐาน และเวลาซิงค์คะแนนล่าสุดจาก GAS</p>
+      <div id="system-health-content"><div class="empty-state">กำลังตรวจสอบ…</div></div>
     </div>
   </div>
 </section>
@@ -1281,6 +1369,12 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     <div class="modal-body">
       <input type="hidden" id="edit-uid"/>
       <div class="input-group"><label>ชื่อ-นามสกุล</label><input type="text" id="edit-name"/></div>
+      <div class="input-group"><label>รหัสนักเรียน</label><input type="text" id="edit-student-id" autocomplete="off"/></div>
+      <div class="input-group">
+        <label for="edit-kci-password">รหัสผ่านเข้าเว็บโรงเรียน (KCI)</label>
+        <input type="text" id="edit-kci-password" autocomplete="off" readonly aria-readonly="true"/>
+        <small id="edit-kci-password-help" style="display:block;margin-top:6px;color:var(--text-muted)">กำลังโหลดข้อมูลรหัสผ่าน…</small>
+      </div>
       <div class="input-group"><label>เลขที่ / ลำดับ</label><input type="number" id="edit-number" min="1"/></div>
       <div class="input-group"><label>เบอร์โทร</label><input type="text" id="edit-tel"/></div>
       <div class="input-group"><label>ห้องเรียน</label><input type="text" id="edit-room"/></div>
@@ -1316,18 +1410,56 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;bac
     </div>
   </div>
 </div>
+<div class="modal-overlay" id="sessionListModal" onclick="closeModal('sessionListModal',event)">
+  <div class="modal" style="max-width:760px">
+    <div class="modal-head">
+      <span class="modal-title"><i data-lucide="monitor-smartphone" class="inline-ico"></i> อุปกรณ์ที่เคยเข้าสู่ระบบ</span>
+      <button class="modal-close" onclick="closeModal('sessionListModal')"><i data-lucide="x" class="modal-close-ico"></i></button>
+    </div>
+    <div class="modal-body"><div id="session-list-status" class="empty-state">กำลังโหลด…</div><div id="session-list-content"></div></div>
+  </div>
+</div>
 <script>
 /* ── STATE ── */
 let DB=null,FUNS=null;
 let SESSION=null;
+let PENDING_LOGIN_RESULT=null;
+let EDIT_MEMBER_CREDENTIAL_LOAD=0;
 let MEMBERS={};
 let ADMINS={};
 let PAYMENTS={};
+let STORAGE_BACKUPS=[];
+let STORAGE_BUSY=false;
+let STORAGE_LOAD_STATE='idle';
+let STORAGE_LOAD_ERROR='';
+let SESSION_TOUCH_TIMER=null;
+let SESSION_LIST_TARGET=null;
 let PAY_HISTORY_VISIBLE_LIMIT=40;
 const PAY_HISTORY_PAGE_SIZE=40;
-let PERMS={class:false,pay:false,history:false,autoRoles:{}};
+let PERMS={class:false,pay:false,history:false,autoRoles:{},rolePermissions:{}};
+let PERMS_ROLE='guest';
+const DEFAULT_ROLE_PERMISSIONS={guest:{class:false,personalData:false,pay:false,history:false},student:{class:true,personalData:false,pay:true,history:true}};
+let CLASS_DIRECTORY={};
+let CLASS_DIRECTORY_STATUS='idle';
+let CLASS_DIRECTORY_ERROR='';
+let _classDirectorySessionKey='';
+let _classDirectoryPromise=null;
+let _classDirectoryPromiseKey='';
+let _classDirectoryRequest=0;
+let PAYMENT_DIRECTORY={members:{},paymentTotals:{}};
+let PAYMENT_DIRECTORY_PERIOD_TOTALS={};
+let PAYMENT_DIRECTORY_STATUS='idle';
+let PAYMENT_DIRECTORY_ERROR='';
+let _paymentDirectorySessionKey='';
+let _paymentDirectoryPromise=null;
+let _paymentDirectoryPromiseKey='';
+let _paymentDirectoryRequest=0;
+let _paymentDirectoryRefreshTimer=null;
 let WALLET_CONFIG={};
 let SUMMARY_CONFIG={showPaidWeeks:true};
+let ADMIN_RSM_EDITING=false;
+let ADMIN_RSM_DRAFT={};
+let _adminRsmSaving=false;
 let ROOM_SUMMARY_FILTER='all';
 let CUR_PAGE='login';
 let _pageRenderVersion=0;
@@ -1338,6 +1470,10 @@ let _roomSummaryPreviewTimer=null;
 let CUR_PAY_YEAR=null;
 let CUR_PAY_MONTH=null;
 let CUR_PAY_WEEK=null;
+let CUR_PAY_WEEK_MANUAL=false;
+let ADMIN_PAYMENT_PERIOD_INITIALIZED=false;
+let ADMIN_PAYMENT_PERIOD_KEY=null;
+let ADMIN_PAYMENT_WEEK_MANUAL=false;
 let WALLET_FILTER='all';
 function isAdminPanelActive(id){
   return CUR_PAGE==='admin' && !!document.getElementById(id)?.classList.contains('active');
@@ -1385,12 +1521,149 @@ function compareMembersByOrder(a,b){
 
 const KCI_API_URL = '/api';
 
+async function apiPost(payload,authenticated=false){
+  const headers={'Content-Type':'application/json'};
+  if(authenticated){
+    const user=FUNS?.auth?.currentUser;
+    if(!user)throw new Error('กรุณาเข้าสู่ระบบใหม่');
+    headers.Authorization=`Bearer ${await user.getIdToken()}`;
+  }
+  const action=String(payload?.action||'');
+  const timeoutMs=['login','memberUpdate'].includes(action)?45000:['health','auditList','storageList','memberCredentialRead'].includes(action)?20000:30000;
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),timeoutMs);
+  try{
+    const response=await fetch(KCI_API_URL,{method:'POST',headers,body:JSON.stringify(payload),signal:controller.signal});
+    const data=await response.json().catch(()=>({success:false,message:'รูปแบบการตอบกลับจาก API ไม่ถูกต้อง'}));
+    if(!response.ok||data.success===false)throw new Error(data.message||`API ตอบกลับ ${response.status}`);
+    return data;
+  }catch(error){
+    if(error?.name==='AbortError')throw new Error(`API ใช้เวลานานเกิน ${Math.round(timeoutMs/1000)} วินาที กรุณาลองรีเฟรชอีกครั้ง`);
+    throw error;
+  }finally{clearTimeout(timeout);}
+}
+
+let SYSTEM_HEALTH={api:'unknown',mainDatabase:'unknown',backupDatabase:'unknown',lastCheckedAt:null,error:''};
+function reportHealthError(service,error){
+  SYSTEM_HEALTH={...SYSTEM_HEALTH,[service]:'error',error:String(error?.message||error||'เชื่อมต่อไม่สำเร็จ')};
+  renderSystemHealth();
+}
+function renderSystemHealth(){
+  const host=document.getElementById('system-health-content');if(!host)return;
+  const labels={api:'Node.js API',mainDatabase:'Firebase RTDB หลัก',backupDatabase:'Firebase RTDB สำรอง'};
+  const stateLabel=value=>value==='ok'?'เชื่อมต่อปกติ':value==='running'?'กำลังซิงก์…':value==='never-run'?'ยังไม่เคยซิงก์':value==='error'||value==='partial_error'?'มีปัญหา':value==='not-configured'?'ยังไม่ได้ตั้งค่า':value==='unknown'?'ยังไม่มีข้อมูล':'กำลังตรวจสอบ';
+  const gasState=SYSTEM_HEALTH.gasStatus==='ok'?'ok':SYSTEM_HEALTH.gasStatus==='partial_error'?'partial_error':SYSTEM_HEALTH.gasStatus==='running'?'running':SYSTEM_HEALTH.gasStatus==='never-run'?'never-run':'unknown';
+  const cards=Object.entries(labels).map(([key,label])=>`<div class="storage-stat-card"><div class="storage-stat-label">${label}</div><div class="storage-stat-value" style="font-size:16px;color:${SYSTEM_HEALTH[key]==='ok'?'var(--green)':SYSTEM_HEALTH[key]==='error'?'var(--red)':'var(--text2)'}">${stateLabel(SYSTEM_HEALTH[key])}</div></div>`);
+  cards.push(`<div class="storage-stat-card"><div class="storage-stat-label">Google Apps Script · ซิงก์คะแนน</div><div class="storage-stat-value" style="font-size:16px;color:${gasState==='ok'?'var(--green)':gasState==='partial_error'?'var(--red)':gasState==='running'?'var(--accent2)':'var(--text2)'}">${stateLabel(gasState)}</div><div class="storage-backup-meta">สำเร็จ ${Number(SYSTEM_HEALTH.gasSuccessCount)||0} · ล้มเหลว ${Number(SYSTEM_HEALTH.gasFailCount)||0}</div></div>`);
+  const gasError=SYSTEM_HEALTH.gasLastError?` · GAS: ${escapeHtml(SYSTEM_HEALTH.gasLastError)}`:'';
+  const serviceErrors=[SYSTEM_HEALTH.mainDatabaseError?`RTDB หลัก: ${SYSTEM_HEALTH.mainDatabaseError}`:'',SYSTEM_HEALTH.backupDatabaseError?`RTDB สำรอง: ${SYSTEM_HEALTH.backupDatabaseError}`:''].filter(Boolean).join(' · ');
+  const gasNote=gasState==='never-run'?'ยังไม่มีบันทึกจาก GAS · ตรวจว่าได้ Run triggerUpdateAllStudents และตั้ง Script Properties แล้ว':'';
+  const diagnostic=SYSTEM_HEALTH.error||serviceErrors||gasNote||'ไม่มีข้อผิดพลาด';
+  host.innerHTML=`<div class="storage-stat-grid">${cards.join('')}<div class="storage-stat-card"><div class="storage-stat-label">ซิงก์สำเร็จล่าสุด</div><div class="storage-stat-value" style="font-size:14px">${SYSTEM_HEALTH.gasLastSync?escapeHtml(new Date(SYSTEM_HEALTH.gasLastSync).toLocaleString('th-TH')):'ยังไม่มีการซิงก์สำเร็จ'}</div><div class="storage-backup-meta">เริ่มรอบล่าสุด ${SYSTEM_HEALTH.gasLastRunAt?escapeHtml(new Date(SYSTEM_HEALTH.gasLastRunAt).toLocaleString('th-TH')):'ยังไม่เคยเริ่มซิงก์'}</div></div></div><div style="font-size:11px;color:var(--text2);margin-top:10px">ตรวจล่าสุด ${SYSTEM_HEALTH.lastCheckedAt?escapeHtml(new Date(SYSTEM_HEALTH.lastCheckedAt).toLocaleString('th-TH')):'—'} · ${escapeHtml(diagnostic)}${gasError}</div>`;
+  ensureLucideIcons(host);
+}
+async function loadSystemHealth(){
+  if(SESSION?.role!=='admin')return;
+  SYSTEM_HEALTH={...SYSTEM_HEALTH,api:'checking',mainDatabase:'checking',backupDatabase:'checking',lastCheckedAt:null,error:''};
+  renderSystemHealth();
+  try{
+    const data=await apiPost({action:'health'},true);
+    SYSTEM_HEALTH={...data.health,lastCheckedAt:Date.now(),error:''};
+  }catch(error){SYSTEM_HEALTH={...SYSTEM_HEALTH,api:'error',lastCheckedAt:Date.now(),error:String(error.message||error)};}
+  renderSystemHealth();
+}
+async function loadAuditLog(){
+  const list=document.getElementById('audit-log-list');const status=document.getElementById('audit-log-status');
+  if(!list||!SESSION?._isAdminAC)return;
+  status.textContent='กำลังโหลดประวัติแก้ไข…';
+  try{
+    const result=await apiPost({action:'auditList'},true);const rows=Array.isArray(result.entries)?result.entries:[];
+    status.textContent=`แสดง ${rows.length} รายการล่าสุด (สูงสุด 200 รายการ)`;
+    if(!rows.length){list.innerHTML='<div class="empty-state">ยังไม่มีประวัติแก้ไข</div>';return;}
+    list.innerHTML=rows.map(item=>{
+      const before=escapeHtml(JSON.stringify(item.before??null,null,2));const after=escapeHtml(JSON.stringify(item.after??null,null,2));
+      return `<article class="storage-backup-row"><div class="storage-backup-info"><div class="storage-backup-name">${escapeHtml(item.action||'แก้ไขข้อมูล')} · ${escapeHtml(item.path||'—')}</div><div class="storage-backup-meta">${escapeHtml(new Date(Number(item.ts)||0).toLocaleString('th-TH'))} · โดย ${escapeHtml(item.actor||'—')}</div><details style="margin-top:8px"><summary style="cursor:pointer;color:var(--accent2);font-size:11px">ดูข้อมูลก่อนและหลัง</summary><div class="input-row" style="align-items:flex-start;margin-top:8px"><pre style="white-space:pre-wrap;overflow:auto;max-height:220px;flex:1;min-width:240px;background:var(--bg2);padding:10px;border-radius:8px;font-size:10px">ก่อน\n${before}</pre><pre style="white-space:pre-wrap;overflow:auto;max-height:220px;flex:1;min-width:240px;background:var(--bg2);padding:10px;border-radius:8px;font-size:10px">หลัง\n${after}</pre></div></details></div></article>`;
+    }).join('');
+  }catch(error){status.textContent=error.message||'โหลดประวัติไม่สำเร็จ';list.innerHTML='<div class="empty-state">ไม่สามารถโหลดประวัติแก้ไขได้</div>';reportHealthError('api',error);}
+}
+async function clearAuditLog(){
+  const list=document.getElementById('audit-log-list');const status=document.getElementById('audit-log-status');const button=document.getElementById('audit-clear-btn');
+  if(!list||!SESSION?._isAdminAC||!window.confirm('ล้างประวัติการแก้ไขทั้งหมดหรือไม่? การลบนี้ย้อนกลับไม่ได้'))return;
+  if(button)button.disabled=true;
+  if(status)status.textContent='กำลังล้างประวัติแก้ไข…';
+  try{
+    const result=await apiPost({action:'auditClear'},true);
+    list.innerHTML='<div class="empty-state">ยังไม่มีประวัติแก้ไข</div>';
+    if(status)status.textContent=`ล้างประวัติแล้ว ${Number(result.deletedCount)||0} รายการ`;
+  }catch(error){
+    if(status)status.textContent=error.message||'ล้างประวัติไม่สำเร็จ';
+    reportHealthError('api',error);
+  }finally{if(button)button.disabled=false;ensureLucideIcons(document.getElementById('ap-audit'));}
+}
+
+function installServerWrites(){
+  if(!FUNS||FUNS.__serverWritesInstalled)return;
+  const raw={set:FUNS.set,update:FUNS.update,push:FUNS.push,remove:FUNS.remove};
+  const host=new URL(FUNS.ref(DB,'/').toString()).host;
+  const pathOf=target=>decodeURIComponent(new URL(target.toString()).pathname.replace(/^\/+|\/+$/g,''));
+  const isMain=target=>new URL(target.toString()).host===host;
+  FUNS.set=async(target,value)=>{
+    if(!isMain(target)||SESSION?.role!=='admin')return raw.set(target,value);
+    return apiPost({action:'dataWrite',operation:'set',path:pathOf(target),value},true);
+  };
+  FUNS.remove=async target=>{
+    if(!isMain(target)||SESSION?.role!=='admin')return raw.remove(target);
+    return apiPost({action:'dataWrite',operation:'delete',path:pathOf(target)},true);
+  };
+  FUNS.push=(target,...args)=>raw.push(target,...args);
+  FUNS.update=async(target,values)=>{
+    if(!isMain(target)||SESSION?.role!=='admin')return raw.update(target,values);
+    return apiPost({action:'dataWrite',operation:'update',path:pathOf(target),values},true);
+  };
+  Object.defineProperty(FUNS,'__serverWritesInstalled',{value:true});
+}
+
 /* ── FIREBASE INIT ── */
 window.addEventListener('firebase-ready',()=>{
   FUNS=window.$db; DB=window.$db.db;
-  startListeners();
-  const cached=localStorage.getItem('42hub_sess');
-  if(cached){try{SESSION=JSON.parse(cached); syncSessionRoleAndAfterLogin();}catch(e){localStorage.removeItem('42hub_sess');}}
+  installServerWrites();
+  FUNS.onAuthStateChanged(FUNS.auth, async user=>{
+    if(!user){
+      stopListeners();
+      SESSION=null;
+      localStorage.removeItem('42hub_sess');
+      return;
+    }
+    if(SESSION?._authUid===user.uid)return;
+    if(PENDING_LOGIN_RESULT?.session){
+      const pending=PENDING_LOGIN_RESULT;
+      SESSION={...pending.session,_isAdminAC:pending.session._isAdminAC===true,_memberAdmin:pending.session._memberAdmin===true,_adminAccountId:pending.session._adminAccountId||null,_authUid:user.uid,_sessionId:pending.deviceSessionId};
+      delete SESSION.password;
+      localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
+      PENDING_LOGIN_RESULT=null;
+      startListeners();startSessionHeartbeat();afterLogin(false);
+      return;
+    }
+    try{
+      const token=await FUNS.getIdTokenResult(user);
+      const claims=token.claims||{};
+      if(!claims.sessionId){localStorage.removeItem('42hub_sess');await FUNS.signOut(FUNS.auth);return;}
+      let cached={};
+      try{cached=JSON.parse(localStorage.getItem('42hub_sess')||'{}');}catch{}
+      const username=String(claims.studentId||claims.username||cached.username||'');
+      if(!username)throw new Error('Firebase token does not identify a user');
+      delete cached.password;
+      const adminAccountId=claims.admin===true&&claims.adminId&&!String(claims.adminId).startsWith('member-')?String(claims.adminId):null;
+      SESSION={...cached,username,role:claims.admin===true?'admin':(cached.role==='admin'?'student':(cached.role||'guest')),_isAdminAC:claims.admin===true,_memberAdmin:claims.memberAdmin===true,_adminAccountId:adminAccountId,_authUid:user.uid,_sessionId:claims.sessionId};
+      localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
+      startListeners();
+      startSessionHeartbeat();
+      afterLogin(false);
+    }catch(error){
+      console.warn('Could not restore authenticated session',error);
+      FUNS.signOut(FUNS.auth).catch(()=>{});
+    }
+  });
 });
 
 /* ── REALTIME SESSION GUARD ── */
@@ -1411,6 +1684,8 @@ function forceLogout(title, msg){
   // Clear session immediately
   SESSION = null;
   localStorage.removeItem('42hub_sess');
+  stopListeners();
+  if(FUNS?.auth)FUNS.signOut(FUNS.auth).catch(()=>{});
 
   setTimeout(()=>{
     document.getElementById('kick-toast').classList.remove('show');
@@ -1437,238 +1712,6 @@ function setRtDot(state){ // 'ok' | 'syncing' | 'disconnected'
   d.title = state==='ok' ? 'เชื่อมต่อฐานข้อมูล (Realtime)' : state==='syncing' ? 'กำลังซิงค์...' : 'ขาดการเชื่อมต่อ';
 }
 
-function startListeners(){
-  if(!DB) return;
-  const{ref,onValue}=FUNS;
-
-  // ── MEMBERS LISTENER ─────────────────────────────────────────────
-  onValue(ref(DB,'members'), snap=>{
-    setRtDot('syncing');
-    MEMBERS = snap.val()||{};
-    if(SESSION?.role==='admin') syncAutomaticRoles();
-    if(isAdminPanelActive('ap-perms')) renderAutoRoleRules();
-
-    if(SESSION){
-      const isAdminAC = !!SESSION._isAdminAC; // site admin — ไม่ต้องอยู่ใน members
-      let foundInMembers = false;
-
-      for(const[,m] of Object.entries(MEMBERS)){
-        if(String(m.studentId)===String(SESSION.username)){
-          foundInMembers = true;
-
-          // ── ตรวจว่า role ถูกเปลี่ยน ──
-          const newRole = getEffectiveMemberRole(m);
-          const roleChanged = newRole !== SESSION.role;
-
-          // ── sync ข้อมูลล่าสุด ──
-          let changed = false;
-          if(m.name && m.name !== SESSION.name)                     { SESSION.name=m.name; changed=true; }
-          if(m.classroom && m.classroom !== SESSION.classroom)       { SESSION.classroom=m.classroom; changed=true; }
-          if(m.tel && m.tel!=='—' && m.tel!==SESSION.tel)           { SESSION.tel=m.tel; changed=true; }
-          if(m.avatar && m.avatar!==SESSION.avatar)                  { SESSION.avatar=m.avatar; changed=true; }
-          if(m.tag !== undefined && m.tag !== SESSION.tag)           { SESSION.tag=m.tag; changed=true; }
-          if(m.scores){
-            const nextScores=recalculateStudentScores(m.scores);
-            if(JSON.stringify(SESSION.scores||{})!==JSON.stringify(nextScores)){
-              SESSION.scores=nextScores; changed=true;
-            }
-          }
-          // ── sync รายงานความดีและประพฤติ ──
-          if(m.goodReports !== undefined){
-            if(JSON.stringify(SESSION.goodReports||[])!==JSON.stringify(m.goodReports)){
-              SESSION.goodReports=m.goodReports; changed=true;
-            }
-          }
-          if(m.badReports !== undefined){
-            if(JSON.stringify(SESSION.badReports||[])!==JSON.stringify(m.badReports)){
-              SESSION.badReports=m.badReports; changed=true;
-            }
-          }
-          if(m.reportsUpdatedAt && m.reportsUpdatedAt!==SESSION.reportsUpdatedAt){
-            SESSION.reportsUpdatedAt=m.reportsUpdatedAt; changed=true;
-          }
-          if(roleChanged){ SESSION.role=newRole; changed=true; }
-
-          if(changed){
-            SESSION._inMembers = true;
-            localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-            updateHomeUI();
-            updateProfilePanel();
-            updateProfileBtn();
-
-            // ถ้า role ถูกลดจาก admin → non-admin ให้ซ่อนเมนูและเปลี่ยนหน้า
-            if(roleChanged && newRole !== 'admin'){
-              document.getElementById('nav-admin').style.display='none';
-              if(CUR_PAGE==='admin') goPage('home');
-            }
-            // ถ้า role ถูกเลื่อนเป็น admin ให้แสดงเมนู
-            if(roleChanged && newRole === 'admin'){
-              document.getElementById('nav-admin').style.display='flex';
-            }
-          }
-          break;
-        }
-      }
-
-      // ── ตรวจการลบสมาชิก ──
-      // ถ้าเคยอยู่ใน members (_inMembers) แต่ตอนนี้หาไม่เจอ → ถูกลบ
-      if(!foundInMembers && SESSION._inMembers && !isAdminAC){
-        forceLogout('บัญชีถูกลบออกจากระบบ','แอดมินได้ลบบัญชีของคุณออกจาก Database แล้ว');
-        setRtDot('disconnected'); return;
-      }
-      if(foundInMembers) SESSION._inMembers = true;
-    }
-
-    if(CUR_PAGE==='class') renderClassmates();
-    if(CUR_PAGE==='pay') renderPayment();
-    if(isAdminPanelActive('ap-members')) renderMemberAdmin();
-    if(isAdminPanelActive('ap-payment')) scheduleAdminRoomSummaryPreview();
-    if(CUR_PAGE==='class'||CUR_PAGE==='admin') updateRoomFilters();
-    if(CUR_PAGE==='home'){
-      updateAdminHomeDashboard();
-      updateStudentHomeDashboard();
-    }
-    setRtDot('ok');
-  }, err=>{
-    console.warn('members listener error', err);
-    setRtDot('disconnected');
-  });
-
-  // ── PAYMENTS LISTENER ─────────────────────────────────────────────
-  onValue(ref(DB,'payments'), snap=>{
-    PAYMENTS = snap.val()||{};
-    if(CUR_PAGE==='pay') renderPayment();
-    if(isAdminPanelActive('ap-payment')){
-      schedulePayHistoryAdminRender();
-      scheduleAdminRoomSummaryPreview();
-    }
-    if(isAdminPanelActive('ap-finance')) renderFinanceSummary();
-    if(CUR_PAGE==='home'){
-      updateAdminHomeDashboard();
-      updateStudentHomeDashboard();
-    }
-  });
-
-  // ── EXPENSES LISTENER ─────────────────────────────────────────────
-  onValue(ref(DB,'expenses'), snap=>{
-    EXPENSES = snap.val()||{};
-    if(isAdminPanelActive('ap-finance')){
-      renderFinanceSummary();
-      if(document.getElementById('fin-expense-panel')?.style.display!=='none') renderExpenseHistory();
-    }
-    if(CUR_PAGE==='home'&&SESSION?.role==='admin') updateAdminHomeDashboard();
-    if(document.getElementById('expenseHistoryModal')?.classList.contains('open')) renderExpenseHistoryModal();
-  });
-
-  // ── LOANS LISTENER ────────────────────────────────────────────────
-  onValue(ref(DB,'loans'), snap=>{
-    LOANS = snap.val()||{};
-    if(isAdminPanelActive('ap-finance')){
-      renderFinanceSummary();
-      if(document.getElementById('fin-loan-panel')?.style.display!=='none') renderLoanHistory();
-    }
-    if(CUR_PAGE==='home'&&SESSION?.role==='admin') updateAdminHomeDashboard();
-    if(document.getElementById('loanHistoryModal')?.classList.contains('open')) renderLoanHistoryModal();
-  });
-
-  // ── INCOMES LISTENER ──────────────────────────────────────────────
-  onValue(ref(DB,'incomes'), snap=>{
-    INCOMES = snap.val()||{};
-    if(isAdminPanelActive('ap-finance')){
-      renderFinanceSummary();
-      if(document.getElementById('fin-income-panel')?.style.display!=='none') renderIncomeHistory();
-    }
-    if(CUR_PAGE==='home'&&SESSION?.role==='admin') updateAdminHomeDashboard();
-  });
-
-  // ── PERMS LISTENER ────────────────────────────────────────────────
-  onValue(ref(DB,'settings/perms'), snap=>{
-    PERMS = {...{class:false,pay:false,history:false,autoRoles:{}},...(snap.val()||{})};
-    applyAutoRoleToCurrentSession();
-    applyPermsUI();
-    if(SESSION?.role==='admin') syncAutomaticRoles();
-  });
-
-  // ── WALLET CONFIG LISTENER ────────────────────────────────────────
-  onValue(ref(DB,'settings/walletConfig'), snap=>{
-    WALLET_CONFIG = snap.val()||{};
-    if(CUR_PAGE==='home'){
-      updateAdminHomeDashboard();
-      updateStudentHomeDashboard();
-    }
-    if(CUR_PAGE==='pay') renderPayment();
-    if(isAdminPanelActive('ap-payment')){
-      onAdminMonthChange();
-      scheduleAdminRoomSummaryPreview();
-    }
-    if(isAdminPanelActive('ap-walletcfg')) renderWalletConfigEditor();
-    if(document.getElementById('roomSummaryModal')?.classList.contains('open')) renderRoomSummaryModal();
-  });
-
-  // ── SUMMARY CONFIG LISTENER ───────────────────────────────────────
-  onValue(ref(DB,'settings/summaryConfig'), snap=>{
-    SUMMARY_CONFIG = snap.val()||{showPaidWeeks:true};
-    applySummaryConfigUI();
-    if(document.getElementById('roomSummaryModal')?.classList.contains('open')) renderRoomSummaryModal();
-  });
-
-  // ── ADMIN ACCOUNTS LISTENER ───────────────────────────────────────
-  onValue(ref(DB,'adminAC'), snap=>{
-    ADMINS = snap.val()||{};
-    if(isAdminPanelActive('ap-admins')) renderAdminAccounts();
-    if(isAdminPanelActive('ap-members')) renderMemberAdmin();
-    if(isAdminPanelActive('ap-payment')) schedulePayHistoryAdminRender();
-
-    // ── ตรวจว่าบัญชีแอดมินที่กำลังใช้งานถูกลบหรือไม่ ──
-    if(SESSION && SESSION._isAdminAC){
-      const stillExists = Object.values(ADMINS).some(
-        a => String(a.username)===String(SESSION.username)
-      );
-      if(!stillExists){
-        forceLogout('บัญชีแอดมินถูกลบ','แอดมินท่านอื่นได้ลบบัญชีของคุณออกจากระบบแล้ว');
-        setRtDot('disconnected'); return;
-      }
-
-      // ── ตรวจสอบรหัสผ่านถูกเปลี่ยน ──
-      const myAC = Object.values(ADMINS).find(a=>String(a.username)===String(SESSION.username));
-      if(myAC && myAC.password && SESSION.password && String(myAC.password)!==String(SESSION.password)){
-        forceLogout('รหัสผ่านถูกเปลี่ยน','รหัสผ่านบัญชีของคุณถูกเปลี่ยน กรุณาล็อกอินใหม่อีกครั้ง');
-        setRtDot('disconnected'); return;
-      }
-
-      // sync ชื่อ/avatar ล่าสุดของแอดมิน
-      if(myAC){
-        let changed=false;
-        if(myAC.name && myAC.name!==SESSION.name)         { SESSION.name=myAC.name; changed=true; }
-        if(myAC.avatar && myAC.avatar!==SESSION.avatar)   { SESSION.avatar=myAC.avatar; changed=true; }
-        if(changed){
-          localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-          updateProfilePanel(); updateProfileBtn();
-          updateAdminHomeDashboard();
-        }
-      }
-    }
-
-  }, err=>{
-    console.warn('adminAC listener error', err);
-    setRtDot('disconnected');
-  });
-
-  // ── FIREBASE CONNECTION STATE ─────────────────────────────────────
-  // ตรวจสอบการเชื่อมต่อ Firebase แบบ realtime
-  try{
-    onValue(ref(DB,'.info/connected'), snap=>{
-      const connected = snap.val();
-      if(connected){
-        setRtDot('ok');
-      } else {
-        setRtDot('disconnected');
-      }
-    });
-  }catch(e){ console.warn('connection info listener failed', e); }
-}
-
-/* ── WALLET CONFIG HELPERS ── */
 function getCurrentYear(){ return new Date().getFullYear()+543; }
 
 function getWalletConfig(year, month){
@@ -1689,6 +1732,91 @@ function getAvailableWeeks(year, month){
   const weeks=[];
   for(let i=1;i<=(cfg.weeks||4);i++) weeks.push(i);
   return weeks;
+}
+
+function getSuggestedPaymentWeek(year, month, date=new Date()){
+  const currentYear=date.getFullYear()+543;
+  const currentMonth=date.getMonth()+1;
+  if(Number(year)!==currentYear||Number(month)!==currentMonth) return 1;
+  const firstDayOfMonth=new Date(date.getFullYear(),date.getMonth(),1).getDay();
+  const calendarWeek=Math.floor((date.getDate()+firstDayOfMonth-1)/7)+1;
+  const configuredWeeks=Math.max(1,getAvailableWeeks(year,month).length);
+  // สัปดาห์เริ่มวันอาทิตย์; หากแถวปฏิทินเกินงวดที่ตั้งไว้ ให้ใช้ยอดงวดสุดท้ายเดิม
+  return Math.min(calendarWeek,configuredWeeks);
+}
+
+let _dbUnsubs=[];
+let _listenersAuthUid='';
+function stopSessionHeartbeat(){if(SESSION_TOUCH_TIMER){clearInterval(SESSION_TOUCH_TIMER);SESSION_TOUCH_TIMER=null;}}
+function startSessionHeartbeat(){
+  stopSessionHeartbeat();
+  const touch=()=>{
+    if(!SESSION||!FUNS?.auth?.currentUser)return;
+    apiPost({action:'sessionTouch'},true).catch(error=>{
+      if(/เซสชัน|เข้าสู่ระบบใหม่/.test(String(error.message||'')))forceLogout('เซสชันถูกยกเลิก','กรุณาเข้าสู่ระบบใหม่');
+    });
+  };
+  // Login already creates a fresh server-side session, so the first heartbeat can wait for the normal interval.
+  SESSION_TOUCH_TIMER=setInterval(touch,5*60*1000);
+}
+function stopListeners(){
+  stopSessionHeartbeat();
+  _dbUnsubs.splice(0).forEach(unsubscribe=>{try{unsubscribe();}catch{}});
+  _listenersAuthUid='';
+  clearPaymentDirectory();
+}
+function startListeners(){
+  if(!DB||!SESSION||!FUNS?.auth?.currentUser)return;
+  const authUid=FUNS.auth.currentUser.uid;
+  if(_listenersAuthUid===authUid)return;
+  stopListeners();
+  _listenersAuthUid=authUid;
+  const {ref,onValue,query,orderByChild,equalTo}=FUNS;
+  const isAdmin=SESSION._isAdminAC===true;
+  const memberRef=ref(DB,'members');
+  const paymentRef=ref(DB,'payments');
+  const memberTarget=isAdmin?memberRef:query(memberRef,orderByChild('studentId'),equalTo(SESSION.username));
+  const paymentTarget=isAdmin?paymentRef:query(paymentRef,orderByChild('studentId'),equalTo(SESSION.username));
+  const listen=(target,next,error)=>_dbUnsubs.push(onValue(target,next,error));
+  listen(memberTarget,snap=>{
+    setRtDot('syncing');MEMBERS=snap.val()||{};
+    if(isAdmin)syncAutomaticRoles();
+    if(isAdminPanelActive('ap-perms'))renderAutoRoleRules();
+    if(SESSION){
+      const own=Object.values(MEMBERS).find(member=>String(member.studentId)===String(SESSION.username));
+      if(!own&&!isAdmin&&SESSION._inMembers){forceLogout('บัญชีถูกนำออก','ไม่พบข้อมูลบัญชีนี้ในรายชื่อนักเรียนแล้ว');setRtDot('disconnected');return;}
+      if(own){
+        const effectiveRole=getEffectiveMemberRole(own);
+        if(SESSION._memberAdmin&&effectiveRole!=='admin'){forceLogout('สิทธิ์แอดมินถูกเปลี่ยน','กรุณาเข้าสู่ระบบใหม่หรือติดต่อผู้ดูแล');setRtDot('disconnected');return;}
+        if(!isAdmin&&effectiveRole==='admin'){forceLogout('บัญชีได้รับสิทธิ์แอดมิน','กรุณาเข้าสู่ระบบใหม่เพื่อรับสิทธิ์ล่าสุด');setRtDot('disconnected');return;}
+        SESSION._inMembers=true;let changed=false;
+        const nextRole=isAdmin?'admin':(effectiveRole==='admin'?'student':effectiveRole);
+        for(const [key,value] of Object.entries({name:own.name,classroom:own.classroom,tel:own.tel,avatar:own.avatar,tag:own.tag})){
+          if(value!=null&&value!==''&&value!=='—'&&SESSION[key]!==value){SESSION[key]=value;changed=true;}
+        }
+        if(own.scores){const scores=recalculateStudentScores(own.scores);if(JSON.stringify(SESSION.scores||{})!==JSON.stringify(scores)){SESSION.scores=scores;changed=true;}}
+        for(const key of ['goodReports','badReports'])if(Array.isArray(own[key])&&JSON.stringify(SESSION[key]||[])!==JSON.stringify(own[key])){SESSION[key]=own[key];changed=true;}
+        if(own.reportsUpdatedAt&&SESSION.reportsUpdatedAt!==own.reportsUpdatedAt){SESSION.reportsUpdatedAt=own.reportsUpdatedAt;changed=true;}
+        if(SESSION.role!==nextRole){SESSION.role=nextRole;changed=true;}
+        if(changed){localStorage.setItem('42hub_sess',JSON.stringify(SESSION));updateHomeUI();updateProfilePanel();updateProfileBtn();}
+      }
+    }
+    if(CUR_PAGE==='class')renderClassmates();if(CUR_PAGE==='pay')renderPayment();
+    if(isAdminPanelActive('ap-members'))renderMemberAdmin();if(isAdminPanelActive('ap-payment'))scheduleAdminRoomSummaryPreview();
+    if(CUR_PAGE==='class'||CUR_PAGE==='admin')updateRoomFilters();
+    if(CUR_PAGE==='home'){updateAdminHomeDashboard();updateStudentHomeDashboard();}setRtDot('ok');
+  },err=>{console.error('members listener error',err);setRtDot('disconnected');reportHealthError('mainDatabase',err);});
+  listen(paymentTarget,snap=>{PAYMENTS=snap.val()||{};if(CUR_PAGE==='pay')renderPayment();if(isAdminPanelActive('ap-payment')){schedulePayHistoryAdminRender();scheduleAdminRoomSummaryPreview();}if(isAdminPanelActive('ap-finance'))renderFinanceSummary();if(CUR_PAGE==='home'){updateAdminHomeDashboard();updateStudentHomeDashboard();}},err=>{console.error('payments listener error',err);setRtDot('disconnected');reportHealthError('mainDatabase',err);});
+  listen(ref(DB,'settings/perms'),snap=>{PERMS={...{class:false,pay:false,history:false,autoRoles:{},rolePermissions:{}},...(snap.val()||{})};applyAutoRoleToCurrentSession();applyPermsUI();if(isAdmin)syncAutomaticRoles();},err=>reportHealthError('mainDatabase',err));
+  listen(ref(DB,'settings/walletConfig'),snap=>{WALLET_CONFIG=snap.val()||{};if(CUR_PAGE==='home'){updateAdminHomeDashboard();updateStudentHomeDashboard();}if(CUR_PAGE==='pay')renderPayment();if(isAdminPanelActive('ap-payment')){onAdminMonthChange();scheduleAdminRoomSummaryPreview();}if(isAdminPanelActive('ap-walletcfg'))renderWalletConfigEditor();if(document.getElementById('roomSummaryModal')?.classList.contains('open'))renderRoomSummaryModal();},err=>reportHealthError('mainDatabase',err));
+  listen(ref(DB,'settings/summaryConfig'),snap=>{SUMMARY_CONFIG=snap.val()||{showPaidWeeks:true};applySummaryConfigUI();if(document.getElementById('roomSummaryModal')?.classList.contains('open'))renderRoomSummaryModal();},err=>reportHealthError('mainDatabase',err));
+  listen(ref(DB,'.info/connected'),snap=>setRtDot(snap.val()?'ok':'disconnected'),err=>reportHealthError('mainDatabase',err));
+  if(isAdmin){
+    listen(ref(DB,'expenses'),snap=>{EXPENSES=snap.val()||{};if(isAdminPanelActive('ap-finance')){renderFinanceSummary();if(document.getElementById('fin-expense-panel')?.style.display!=='none')renderExpenseHistory();}if(CUR_PAGE==='home')updateAdminHomeDashboard();if(document.getElementById('expenseHistoryModal')?.classList.contains('open'))renderExpenseHistoryModal();},err=>reportHealthError('mainDatabase',err));
+    listen(ref(DB,'loans'),snap=>{LOANS=snap.val()||{};if(isAdminPanelActive('ap-finance')){renderFinanceSummary();if(document.getElementById('fin-loan-panel')?.style.display!=='none')renderLoanHistory();}if(CUR_PAGE==='home')updateAdminHomeDashboard();if(document.getElementById('loanHistoryModal')?.classList.contains('open'))renderLoanHistoryModal();},err=>reportHealthError('mainDatabase',err));
+    listen(ref(DB,'incomes'),snap=>{INCOMES=snap.val()||{};if(isAdminPanelActive('ap-finance')){renderFinanceSummary();if(document.getElementById('fin-income-panel')?.style.display!=='none')renderIncomeHistory();}if(CUR_PAGE==='home')updateAdminHomeDashboard();},err=>reportHealthError('mainDatabase',err));
+    listen(ref(DB,'adminProfiles'),snap=>{ADMINS=snap.val()||{};if(isAdminPanelActive('ap-admins'))renderAdminAccounts();if(isAdminPanelActive('ap-members'))renderMemberAdmin();if(isAdminPanelActive('ap-payment'))schedulePayHistoryAdminRender();if(SESSION._adminAccountId&&!ADMINS[SESSION._adminAccountId])forceLogout('บัญชีแอดมินถูกลบ','บัญชีที่กำลังใช้งานถูกนำออกจากระบบแล้ว');const mine=SESSION._adminAccountId?ADMINS[SESSION._adminAccountId]:null;if(mine){let changed=false;if(mine.name&&mine.name!==SESSION.name){SESSION.name=mine.name;changed=true;}if(mine.avatar&&mine.avatar!==SESSION.avatar){SESSION.avatar=mine.avatar;changed=true;}if(changed){localStorage.setItem('42hub_sess',JSON.stringify(SESSION));updateProfilePanel();updateProfileBtn();updateAdminHomeDashboard();}}},err=>reportHealthError('mainDatabase',err));
+  }else{ADMINS={};EXPENSES={};LOANS={};INCOMES={};}
 }
 
 /* ── ROOM SUMMARY HELPERS (สรุปเงินห้อง) ── */
@@ -1759,7 +1887,8 @@ function computeStudentOutstanding(m, cols, paidMap){
 /* ── ROOM FILTER HELPERS ── */
 function getAllRooms(){
   const rooms=new Set();
-  Object.values(MEMBERS).forEach(m=>{ if(m.classroom) rooms.add(String(m.classroom)); });
+  const source=SESSION?._isAdminAC===true?MEMBERS:{...(MEMBERS||{}),...(CLASS_DIRECTORY||{}),...(PAYMENT_DIRECTORY.members||{})};
+  Object.values(source||{}).forEach(m=>{ if(m.classroom) rooms.add(String(m.classroom)); });
   return [...rooms].sort();
 }
 
@@ -1769,205 +1898,69 @@ function updateRoomFilters(){
 
 /* ── AUTH VIA FIREBASE CACHE + NODE.JS API ── */
 async function doLogin(){
-  const u=document.getElementById('uInput').value.trim();
-  const p=document.getElementById('pInput').value.trim();
-  const al=document.getElementById('loginAlert');
-  al.className='alert-box'; al.style.display='none';
-  if(!u||!p){showAlert(al,'กรุณากรอกข้อมูลให้ครบ');return;}
-
-  const btn=document.getElementById('loginBtn');
-  btn.disabled=true; btn.innerHTML='<span class="spinner"></span>กำลังตรวจสอบบัญชี...';
-
+  const username=document.getElementById('uInput').value.trim();
+  const password=document.getElementById('pInput').value;
+  const alertBox=document.getElementById('loginAlert');
+  alertBox.className='alert-box';alertBox.style.display='none';
+  if(!username||!password){showAlert(alertBox,'กรุณากรอกข้อมูลให้ครบ');return;}
+  const button=document.getElementById('loginBtn');
+  button.disabled=true;button.innerHTML='<span class="spinner"></span>กำลังตรวจสอบบัญชี...';
   try{
-    if(DB){
-      const {ref,get}=FUNS;
-      try{
-        const adminSnap=await get(ref(DB,'adminAC'));
-        const allAdmins=adminSnap.val()||{};
-        for(const a of Object.values(allAdmins)){
-          if(String(a.username)===u && String(a.password)===p){
-            SESSION={username:u,password:p,name:a.name||u,role:'admin',avatar:a.avatar||null,_isAdminAC:true};
-            localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-            afterLogin(true);
-            return;
-          }
-        }
-      }catch(e){console.warn('adminAC check failed',e);}
-
-      // ใช้ snapshot ที่ listener โหลดไว้แล้ว; ถ้ายังไม่มีรายการ ให้โหลด Firebase หนึ่งครั้ง
-      let member=Object.values(MEMBERS).find(item=>String(item.studentId)===u)||null;
-      if(!member){
-        try{
-          const memberSnap=await get(ref(DB,'members'));
-          const allMembers=memberSnap.val()||{};
-          member=Object.values(allMembers).find(item=>String(item.studentId)===u)||null;
-        }catch(e){console.warn('member cache check failed',e);}
-      }
-      const verifiedAt=Number(member?.lastLogin||0);
-      const cacheAge=Date.now()-verifiedAt;
-      const cacheIsFresh=Number.isFinite(verifiedAt)&&cacheAge>=0&&cacheAge<24*60*60*1000;
-      if(member && String(member.lastPassword||'')===p && cacheIsFresh){
-        SESSION={
-          username:u,password:p,name:member.name||null,role:member.role||'guest',
-          tel:member.tel||null,classroom:member.classroom||null,
-          scores:recalculateStudentScores(member.scores||{good:'0',bad:'0'}),
-          avatar:member.avatar||null,tag:member.tag||null,
-          goodReports:Array.isArray(member.goodReports)?member.goodReports:[],
-          badReports:Array.isArray(member.badReports)?member.badReports:[],
-          reportsUpdatedAt:member.reportsUpdatedAt||null
-        };
-        localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-        afterLogin(true);
-        return;
-      }
-    }
-
-    // รหัสใหม่หรือการยืนยันเก่ากว่า 24 ชั่วโมง ให้ตรวจรหัสกับ KCI จริง
-    btn.innerHTML='<span class="spinner"></span>กำลังเชื่อมต่อ KCI...';
-    const res=await fetch(KCI_API_URL,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({username:u,password:p})
-    });
-    const data=await res.json();
-    if(!data.success){
-      const errMsg=data.message||'เข้าสู่ระบบ KCI ไม่สำเร็จ';
-      showAlert(al,errMsg+' — โปรดตรวจสอบรหัสนักเรียนและรหัสผ่านจากเว็บ KCI');
-      return;
-    }
-
-    let studentName=(data.student&&data.student.trim())?data.student.trim():null;
-    let classroomFromDB=(data.classroom&&data.classroom.trim())?data.classroom.trim():null;
-    let telFromDB=(data.tel&&data.tel!=='—')?data.tel:null;
-    let scoresFromDB=data.scores||{good:'0',bad:'0',total:'0'};
-    let role='guest';
-    let tagFromDB=null;
-    let goodReportsFromDB=data.goodReports||[];
-    let badReportsFromDB=data.badReports||[];
-    let reportsUpdatedAt=(goodReportsFromDB.length>0||badReportsFromDB.length>0)?Date.now():null;
-
-    if(DB){
-      const {ref,get}=FUNS;
-      const snap=await get(ref(DB,'members'));
-      const all=snap.val()||{};
-      for(const m of Object.values(all)){
-        if(String(m.studentId)===u){
-          studentName=m.name||studentName;
-          classroomFromDB=m.classroom||classroomFromDB;
-          telFromDB=(m.tel&&m.tel!=='—')?m.tel:telFromDB;
-          scoresFromDB=m.scores||scoresFromDB;
-          role=getEffectiveMemberRole(m);
-          if(m.tag)tagFromDB=m.tag;
-          if(m.goodReports&&m.goodReports.length>=goodReportsFromDB.length)goodReportsFromDB=m.goodReports;
-          if(m.badReports&&m.badReports.length>=badReportsFromDB.length)badReportsFromDB=m.badReports;
-          if(m.reportsUpdatedAt)reportsUpdatedAt=m.reportsUpdatedAt;
-          break;
-        }
-      }
-    }
-    role=getEffectiveMemberRole({classroom:classroomFromDB,role});
-
-    SESSION={
-      username:u,password:p,name:studentName,role:role,tel:telFromDB,
-      classroom:classroomFromDB,scores:recalculateStudentScores(scoresFromDB),
-      tag:tagFromDB,goodReports:goodReportsFromDB,badReports:badReportsFromDB,
-      reportsUpdatedAt:reportsUpdatedAt
-    };
+    const result=await apiPost({action:'login',username,password});
+    if(!result.customToken||!result.session)throw new Error('API ไม่ได้ส่งข้อมูลยืนยันตัวตนกลับมา');
+    PENDING_LOGIN_RESULT=result;
+    const credential=await FUNS.signInWithCustomToken(FUNS.auth,result.customToken);
+    const alreadyActive=SESSION?._authUid===credential.user.uid;
+    SESSION={...result.session,_isAdminAC:result.session._isAdminAC===true,_memberAdmin:result.session._memberAdmin===true,_adminAccountId:result.session._adminAccountId||null,_authUid:credential.user.uid,_sessionId:result.deviceSessionId};
+    delete SESSION.password;
     localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-    afterLogin(true);
-  }catch(e){
-    showAlert(al,'เกิดข้อผิดพลาดในการซิงค์: กรุณาตรวจสอบการตั้งค่า Vercel API และเครือข่าย');
-  }finally{
-    btn.disabled=false; btn.innerHTML='เข้าสู่ระบบ';
-  }
+    if(!alreadyActive){stopListeners();startListeners();startSessionHeartbeat();afterLogin(true);}
+    PENDING_LOGIN_RESULT=null;
+    document.getElementById('pInput').value='';
+  }catch(error){
+    PENDING_LOGIN_RESULT=null;
+    showAlert(alertBox,error.message||'เข้าสู่ระบบไม่สำเร็จ กรุณาลองใหม่');
+  }finally{button.disabled=false;button.innerHTML='เข้าสู่ระบบ';}
 }
 
-async function syncSessionRoleAndAfterLogin(){
-  if(!SESSION) return;
-  // หยุดการล็อกอินอัตโนมัติหากไม่สามารถยืนยันในฐานข้อมูลได้
-  if(!DB){
-    localStorage.removeItem('42hub_sess');
-    console.warn('Auto-login canceled: DB not available');
-    const al=document.getElementById('loginAlert');
-    if(al) showAlert(al,'ยกเลิกการล็อกอินอัตโนมัติ: ไม่สามารถเชื่อมต่อฐานข้อมูล โปรดล็อกอินด้วยรหัสนักเรียน');
-    document.getElementById('navbar').style.display='none';
-    document.getElementById('profileBtn').style.display='none';
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    const loginPage=document.getElementById('page-login');
-    loginPage.classList.add('active'); loginPage.style.display='';
-    CUR_PAGE='login';
-    return;
-  }
-
-  try {
-    const{ref,get}=FUNS;
-    const snap=await get(ref(DB,'members'));
-    const all=snap.val()||{};
-    let found=false;
-    for(const[uid,m] of Object.entries(all)){
-      if(String(m.studentId)===String(SESSION.username)){
-        // ใช้ค่าจาก Firebase เป็นหลัก
-        if(m.name)      SESSION.name      = m.name;
-        if(m.classroom) SESSION.classroom = m.classroom;
-        if(m.tel && m.tel !== '—') SESSION.tel = m.tel;
-        if(m.scores)    SESSION.scores    = recalculateStudentScores(m.scores);
-        if(m.avatar)    SESSION.avatar    = m.avatar;
-        if(m.tag)       SESSION.tag       = m.tag;
-        // sync รายงานความดีและประพฤติ
-        if(m.goodReports)       SESSION.goodReports       = m.goodReports;
-        if(m.badReports)        SESSION.badReports        = m.badReports;
-        if(m.reportsUpdatedAt)  SESSION.reportsUpdatedAt  = m.reportsUpdatedAt;
-        SESSION.role = m.role || SESSION.role || 'guest';
-        found = true;
-        break;
-      }
+async function doRefresh(button){
+  if(!SESSION||SESSION.role==='admin')return;
+  const btn=button||window.event?.currentTarget||window.event?.target?.closest?.('button');if(!btn)return;
+  btn.innerHTML='<span class="spinner"></span> ซิงค์...';btn.disabled=true;
+  try{
+    const headers={'Content-Type':'application/json',Authorization:`Bearer ${await FUNS.auth.currentUser.getIdToken()}`};
+    const requestRefresh=async password=>{
+      const payload={action:'refreshScores',username:SESSION.username};
+      if(password)payload.password=password;
+      const response=await fetch(KCI_API_URL,{method:'POST',headers,body:JSON.stringify(payload)});
+      const data=await response.json();
+      if(data.code==='KCI_PASSWORD_REQUIRED')return data;
+      if(!response.ok||!data.success)throw new Error(data.message||'ดึงข้อมูลจาก KCI ไม่สำเร็จ');
+      return data;
+    };
+    let data=await requestRefresh();
+    if(data.code==='KCI_PASSWORD_REQUIRED'){
+      const password=window.prompt('ยังไม่มีรหัสผ่าน KCI ในระบบ กรุณากรอกรหัสผ่านเพื่อยืนยันและดึงข้อมูล');
+      if(password===null)return;
+      if(!password){alert('กรุณากรอกรหัสผ่าน KCI');return;}
+      data=await requestRefresh(password);
     }
+    const own=Object.values(MEMBERS||{}).find(member=>String(member.studentId)===String(SESSION.username));
+    if(own){SESSION.scores=recalculateStudentScores(own.scores||data.scores||{});SESSION.goodReports=own.goodReports||data.goodReports||[];SESSION.badReports=own.badReports||data.badReports||[];SESSION.reportsUpdatedAt=own.reportsUpdatedAt||Date.now();}
+    updateHomeUI();
+    alert('อัปเดตข้อมูลจาก KCI สำเร็จ');
+  }catch(error){alert(error.message||'เกิดข้อผิดพลาดขณะซิงค์');}
+  finally{btn.innerHTML='<i data-lucide="refresh-cw" class="btn-ico"></i> รีเฟรชข้อมูล';btn.disabled=false;ensureLucideIcons(btn);}
+}
 
-    if(found){
-      localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-      afterLogin(false);
-      return;
-    }
-
-    // หากไม่พบใน members ให้ตรวจสอบ adminAC (site admins) ด้วย
-    try{
-      const snapA = await get(ref(DB,'adminAC'));
-      const allA = snapA.val()||{};
-      for(const[aid,a] of Object.entries(allA)){
-        if(String(a.username)===String(SESSION.username)){
-          SESSION.name = a.name || SESSION.name;
-          if(a.avatar) SESSION.avatar = a.avatar;
-          SESSION.role = 'admin';
-          SESSION._isAdminAC = true;
-          localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-          afterLogin(false);
-          return;
-        }
-      }
-    }catch(e){}
-
-    // ถ้ายังไม่พบเลย ให้ยกเลิกการล็อกอินอัตโนมัติ
-    localStorage.removeItem('42hub_sess');
-    console.warn('Auto-login canceled: student/admin not found in DB', SESSION.username);
-    const al=document.getElementById('loginAlert');
-    if(al) showAlert(al,'ยกเลิกการล็อกอินอัตโนมัติ: ไม่พบรหัสผู้ใช้ในฐานข้อมูล — กรุณาล็อกอินด้วยรหัสจริง');
-    document.getElementById('navbar').style.display='none';
-    document.getElementById('profileBtn').style.display='none';
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    const loginPage=document.getElementById('page-login');
-    loginPage.classList.add('active'); loginPage.style.display='';
-    CUR_PAGE='login';
-  } catch(e) {
-    console.warn("syncSessionRole ล้มเหลว", e);
-    localStorage.removeItem('42hub_sess');
-    const al=document.getElementById('loginAlert');
-    if(al) showAlert(al,'ยกเลิกการล็อกอินอัตโนมัติ: เกิดข้อผิดพลาดในการตรวจสอบฐานข้อมูล');
-    document.getElementById('navbar').style.display='none';
-    document.getElementById('profileBtn').style.display='none';
-    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-    const loginPage=document.getElementById('page-login');
-    loginPage.classList.add('active'); loginPage.style.display='';
-    CUR_PAGE='login';
-  }
+async function logout(){
+  try{if(SESSION?._sessionId&&FUNS?.auth?.currentUser)await apiPost({action:'sessionEnd'},true);}catch(error){console.warn('Session close was not confirmed:',error.message||error);}
+  stopListeners();SESSION=null;localStorage.removeItem('42hub_sess');
+  if(FUNS?.auth)await FUNS.signOut(FUNS.auth).catch(error=>console.warn('Firebase sign-out failed',error));
+  document.getElementById('navbar').style.display='none';document.getElementById('profileBtn').style.display='none';document.getElementById('nav-admin').style.display='none';document.getElementById('profilePanel').classList.remove('open');
+  const dot=document.getElementById('rt-dot');if(dot)dot.style.display='none';
+  document.querySelectorAll('.page').forEach(page=>{page.classList.remove('active');page.style.display='';});document.querySelectorAll('.nav-btn').forEach(button=>button.classList.remove('active'));
+  const loginPage=document.getElementById('page-login');loginPage.style.display='';loginPage.classList.add('active');CUR_PAGE='login';document.getElementById('uInput').value='';document.getElementById('pInput').value='';
 }
 
 function afterLogin(fresh){
@@ -2004,6 +1997,15 @@ function formatAdminMoney(value){
   return n.toLocaleString('th-TH',{maximumFractionDigits:2})+'฿';
 }
 
+function formatPaymentMovement(payment){
+  const amount=Number.parseFloat(String(payment?.amount??0).replace(/[\s,]/g,''))||0;
+  return `${amount<0?'−':'+'}${formatAdminMoney(Math.abs(amount))}`;
+}
+
+function paymentMovementColor(payment){
+  return Number.parseFloat(String(payment?.amount??0).replace(/[\s,]/g,''))<0?'var(--red)':'var(--green)';
+}
+
 function updateAdminHomeDashboard(){
   if(SESSION?.role!=='admin') return;
   const home=document.getElementById('home-admin-content');
@@ -2025,6 +2027,7 @@ function updateAdminHomeDashboard(){
   setText('admin-kpi-members',members.length.toLocaleString('th-TH'));
   setText('admin-kpi-collected',formatAdminMoney(collected+otherIncome));
   setText('admin-kpi-net',formatAdminMoney(net));
+  setText('admin-kpi-expenses',formatAdminMoney(expenses));
   const netEl=document.getElementById('admin-kpi-net');
   if(netEl)netEl.style.color=net>=0?'var(--green)':'var(--red)';
 
@@ -2105,7 +2108,7 @@ function updateAdminHomeDashboard(){
         const member=members.find(m=>String(m.studentId)===String(p.studentId));
         const studentName=member?.name||p.studentName||p.studentId||'—';
         const date=p.ts?new Date(p.ts).toLocaleDateString('th-TH',{day:'numeric',month:'short'}):`${MONTHS[(Number(p.month)||1)-1]} ${p.year||year}`;
-        return `<div class="admin-home-latest-row"><div class="admin-home-latest-avatar">${avatarEmoji(member||p.studentId||'💳')}</div><div class="admin-home-latest-info"><div class="admin-home-latest-name">${escapeHtml(studentName)}</div><div class="admin-home-latest-meta">${date} · ${MONTHS[(Number(p.month)||1)-1]} ${p.year||year} ส.${p.week||'?'}</div></div><div class="admin-home-latest-amount">+${formatAdminMoney(amountOf(p))}</div></div>`;
+        return `<div class="admin-home-latest-row"><div class="admin-home-latest-avatar">${avatarEmoji(member||p.studentId||'💳')}</div><div class="admin-home-latest-info"><div class="admin-home-latest-name">${escapeHtml(studentName)}${p.summaryAdjustment?' · ปรับยอด':''}</div><div class="admin-home-latest-meta">${date} · ${MONTHS[(Number(p.month)||1)-1]} ${p.year||year} ส.${p.week||'?'}</div></div><div class="admin-home-latest-amount" style="color:${paymentMovementColor(p)}">${formatPaymentMovement(p)}</div></div>`;
       }).join('');
     }
   }
@@ -2164,8 +2167,11 @@ function updateStudentHomeDashboard(){
     </div><div class="student-home-sync">ข้อมูลรายงานของบัญชีนี้ · ${syncLabel}</div><button class="btn btn-sm btn-outline student-home-detail-btn" onclick="openScoreModal('total')"><i data-lucide="list" class="btn-ico"></i> ดูรายละเอียดคะแนน</button>`;
   }
 
+  const paymentCard=document.getElementById('student-home-payment-card');
+  const canViewPayments=hasRolePermission('pay');
+  if(paymentCard)paymentCard.style.display=canViewPayments?'':'none';
   const historyCard=document.getElementById('student-home-history-card');
-  const canViewHistory=SESSION.role!=='guest'||!!PERMS.history;
+  const canViewHistory=hasRolePermission('history');
   if(historyCard)historyCard.style.display=canViewHistory?'':'none';
   const latestEl=document.getElementById('student-home-latest-payments');
   if(latestEl){
@@ -2181,7 +2187,7 @@ function updateStudentHomeDashboard(){
         const date=Number.isFinite(ts)&&ts>0?new Date(ts):null;
         const dateLabel=date&&!Number.isNaN(date.getTime())?date.toLocaleDateString('th-TH',{day:'numeric',month:'short'}):'บันทึกแล้ว';
         const note=p.note?` · ${escapeHtml(p.note)}`:'';
-        return `<div class="admin-home-latest-row"><div class="admin-home-latest-avatar">${avatarEmoji(SESSION)}</div><div class="admin-home-latest-info"><div class="admin-home-latest-name">ชำระเงินห้อง · ${monthName} ${p.year||year} ส.${p.week||'?'}</div><div class="admin-home-latest-meta">${dateLabel}${note}</div></div><div class="admin-home-latest-amount">+${formatAdminMoney(amountOf(p))}</div></div>`;
+        return `<div class="admin-home-latest-row"><div class="admin-home-latest-avatar">${avatarEmoji(SESSION)}</div><div class="admin-home-latest-info"><div class="admin-home-latest-name">${p.summaryAdjustment?'ปรับยอดเงินห้อง':'ชำระเงินห้อง'} · ${monthName} ${p.year||year} ส.${p.week||'?'}</div><div class="admin-home-latest-meta">${dateLabel}${note}</div></div><div class="admin-home-latest-amount" style="color:${paymentMovementColor(p)}">${formatPaymentMovement(p)}</div></div>`;
       }).join('');
     }
   }
@@ -2222,70 +2228,6 @@ function updateHomeUI(){
   try{if(typeof ensureLucideIcons==='function')ensureLucideIcons(document.getElementById('home-role-badge'));}catch(e){}
 }
 
-function logout(){
-  SESSION=null;
-  localStorage.removeItem('42hub_sess');
-  document.getElementById('navbar').style.display='none';
-  document.getElementById('profileBtn').style.display='none';
-  document.getElementById('nav-admin').style.display='none';
-  document.getElementById('profilePanel').classList.remove('open');
-  const dot=document.getElementById('rt-dot');
-  if(dot) dot.style.display='none';
-
-  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='';});
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
-  const loginPage=document.getElementById('page-login');
-  loginPage.style.display='';
-  loginPage.classList.add('active');
-  CUR_PAGE='login';
-
-  document.getElementById('uInput').value='';
-  document.getElementById('pInput').value='';
-}
-
-/* ── REFRESH SCORES FROM FRONTEND ── */
-async function doRefresh(button){
-  if(!SESSION)return;
-  const btn=button||(window.event?.currentTarget)||(window.event?.target?.closest?.('button'));
-  if(!btn)return;
-  btn.innerHTML='<span class="spinner"></span> ซิงค์...'; btn.disabled=true;
-  try {
-    // 1. ส่งไปยัง API เพื่ออัปเดตข้อมูลใน Firebase
-    const res=await fetch(KCI_API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username: SESSION.username, password: SESSION.password })
-    });
-    const data=await res.json();
-    if(data.success){
-      // API อัปเดต Firebase แล้ว — ดึงข้อมูลล่าสุดกลับมา sync SESSION
-      if(DB){
-        const{ref,get}=FUNS;
-        const snap=await get(ref(DB,'members'));
-        const all=snap.val()||{};
-        for(const[uid,m] of Object.entries(all)){
-          if(String(m.studentId)===String(SESSION.username)){
-            if(m.name)      SESSION.name      = m.name;
-            if(m.classroom) SESSION.classroom = m.classroom;
-            if(m.tel && m.tel !== '—') SESSION.tel = m.tel;
-            if(m.scores)    SESSION.scores    = recalculateStudentScores(m.scores);
-            SESSION.role = m.role || SESSION.role || 'guest';
-            break;
-          }
-        }
-      }
-      localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
-      // อัปเดต UI ทั้งหมดจาก SESSION ที่ sync มาแล้ว
-      updateHomeUI();
-      updateProfilePanel();
-      updateProfileBtn();
-    }
-  } catch(e) {}
-  btn.innerHTML='<i data-lucide="refresh-cw" class="btn-ico"></i> รีเฟรชข้อมูล'; btn.disabled=false;
-   try{ if(typeof ensureLucideIcons==='function') ensureLucideIcons(btn); }catch(e){}
-}
-
-/* ── SCORE MODAL ── */
 function buildReportTable(reports, type) {
   if (!reports || reports.length === 0) {
     return `<div class="report-empty">${type === 'good' ? '😊 ยังไม่มีรายการความดีที่บันทึก' : '😓 ยังไม่มีรายการที่ถูกหัก'}</div>`;
@@ -2386,69 +2328,187 @@ async function openScoreModal(mode){
 }
 
 /* ── CLASSMATES with FILTER & SORT ── */
+function clearClassDirectory(){
+  _classDirectoryRequest++;
+  _classDirectoryPromise=null;
+  _classDirectoryPromiseKey='';
+  _classDirectorySessionKey='';
+  CLASS_DIRECTORY={};CLASS_DIRECTORY_STATUS='idle';CLASS_DIRECTORY_ERROR='';
+}
+
+function clearPaymentDirectory(){
+  if(_paymentDirectoryRefreshTimer){clearInterval(_paymentDirectoryRefreshTimer);_paymentDirectoryRefreshTimer=null;}
+  _paymentDirectoryRequest++;
+  _paymentDirectoryPromise=null;
+  _paymentDirectoryPromiseKey='';
+  _paymentDirectorySessionKey='';
+  PAYMENT_DIRECTORY={members:{},paymentTotals:{}};
+  PAYMENT_DIRECTORY_PERIOD_TOTALS={};
+  PAYMENT_DIRECTORY_STATUS='idle';PAYMENT_DIRECTORY_ERROR='';
+}
+
+function startPaymentDirectoryRefresh(){
+  if(_paymentDirectoryRefreshTimer||SESSION?._isAdminAC===true||!hasRolePermission('pay'))return;
+  _paymentDirectoryRefreshTimer=setInterval(()=>{
+    if(CUR_PAGE==='pay'&&SESSION&&!SESSION._isAdminAC&&hasRolePermission('pay'))loadPaymentDirectory(true);
+    else if(CUR_PAGE!=='pay'){clearInterval(_paymentDirectoryRefreshTimer);_paymentDirectoryRefreshTimer=null;}
+  },60000);
+}
+
+async function loadClassDirectory(){
+  if(!SESSION||SESSION._isAdminAC===true||!hasRolePermission('class')){clearClassDirectory();return;}
+  const sessionKey=`${SESSION._authUid||SESSION.username}:${SESSION.role}:${hasRolePermission('personalData')?'personal':'basic'}`;
+  if(CLASS_DIRECTORY_STATUS==='ready'&&_classDirectorySessionKey===sessionKey)return;
+  if(_classDirectoryPromise&&_classDirectoryPromiseKey===sessionKey)return _classDirectoryPromise;
+  const requestId=++_classDirectoryRequest;
+  const sessionUid=String(SESSION._authUid||SESSION.username);
+  _classDirectorySessionKey=sessionKey;
+  _classDirectoryPromiseKey=sessionKey;
+  CLASS_DIRECTORY={};CLASS_DIRECTORY_STATUS='loading';CLASS_DIRECTORY_ERROR='';
+  _classDirectoryPromise=(async()=>{
+    try{
+      const result=await apiPost({action:'classDirectory'},true);
+      if(requestId!==_classDirectoryRequest||!SESSION||String(SESSION._authUid||SESSION.username)!==sessionUid||!hasRolePermission('class'))return;
+      CLASS_DIRECTORY=result.members&&typeof result.members==='object'?result.members:{};
+      CLASS_DIRECTORY_STATUS='ready';
+    }catch(error){
+      if(requestId!==_classDirectoryRequest)return;
+      CLASS_DIRECTORY={};CLASS_DIRECTORY_STATUS='error';CLASS_DIRECTORY_ERROR=String(error?.message||'โหลดรายชื่อนักเรียนไม่สำเร็จ');
+      console.warn('class directory load failed',error);
+    }finally{
+      if(requestId===_classDirectoryRequest){_classDirectoryPromise=null;_classDirectoryPromiseKey='';if(CUR_PAGE==='class')renderClassmates();}
+    }
+  })();
+  return _classDirectoryPromise;
+}
+
+async function loadPaymentDirectory(force=false){
+  if(!SESSION||SESSION._isAdminAC===true||!hasRolePermission('pay')){clearPaymentDirectory();return;}
+  const sessionKey=`${SESSION._authUid||SESSION.username}:${SESSION.role}:${hasRolePermission('personalData')?'personal':'basic'}`;
+  if(_paymentDirectorySessionKey&&_paymentDirectorySessionKey!==sessionKey)clearPaymentDirectory();
+  if(PAYMENT_DIRECTORY_STATUS==='ready'&&_paymentDirectorySessionKey===sessionKey&&!force)return;
+  if(_paymentDirectoryPromise&&_paymentDirectoryPromiseKey===sessionKey)return _paymentDirectoryPromise;
+  const requestId=++_paymentDirectoryRequest;
+  const sessionUid=String(SESSION._authUid||SESSION.username);
+  const preserveReadyData=force&&PAYMENT_DIRECTORY_STATUS==='ready';
+  _paymentDirectorySessionKey=sessionKey;
+  _paymentDirectoryPromiseKey=sessionKey;
+  if(!preserveReadyData){PAYMENT_DIRECTORY={members:{},paymentTotals:{}};PAYMENT_DIRECTORY_PERIOD_TOTALS={};PAYMENT_DIRECTORY_STATUS='loading';}
+  PAYMENT_DIRECTORY_ERROR='';
+  _paymentDirectoryPromise=(async()=>{
+    try{
+      const result=await apiPost({action:'paymentDirectory'},true);
+      const currentSessionKey=SESSION?`${SESSION._authUid||SESSION.username}:${SESSION.role}:${hasRolePermission('personalData')?'personal':'basic'}`:'';
+      if(requestId!==_paymentDirectoryRequest||!SESSION||String(SESSION._authUid||SESSION.username)!==sessionUid||currentSessionKey!==sessionKey||!hasRolePermission('pay'))return;
+      PAYMENT_DIRECTORY={
+        members:result.members&&typeof result.members==='object'?result.members:{},
+        paymentTotals:result.paymentTotals&&typeof result.paymentTotals==='object'?result.paymentTotals:{}
+      };
+      PAYMENT_DIRECTORY_PERIOD_TOTALS=result.periodTotals&&typeof result.periodTotals==='object'?result.periodTotals:{};
+      PAYMENT_DIRECTORY_STATUS='ready';
+    }catch(error){
+      if(requestId!==_paymentDirectoryRequest)return;
+      if(!preserveReadyData){PAYMENT_DIRECTORY={members:{},paymentTotals:{}};PAYMENT_DIRECTORY_PERIOD_TOTALS={};PAYMENT_DIRECTORY_STATUS='error';}
+      PAYMENT_DIRECTORY_ERROR=String(error?.message||'โหลดข้อมูลเงินห้องไม่สำเร็จ');
+      console.warn('payment directory load failed',error);
+    }finally{
+      if(requestId===_paymentDirectoryRequest){
+        _paymentDirectoryPromise=null;_paymentDirectoryPromiseKey='';
+        if(CUR_PAGE==='pay')renderPayTable();
+      }
+    }
+  })();
+  return _paymentDirectoryPromise;
+}
+
 function renderClassmates(){
   if(!SESSION)return;
   const content=document.getElementById('class-content');
   const wall=document.getElementById('class-guest-wall');
-  if(SESSION.role==='guest'&&!PERMS.class){
+  const scopeNote=document.getElementById('class-scope-note');
+  const isAdmin=SESSION._isAdminAC===true;
+  const canViewPersonalData=isAdmin||hasRolePermission('personalData');
+  if(scopeNote){scopeNote.style.display=isAdmin?'none':'block';scopeNote.textContent=canViewPersonalData?'แสดงข้อมูลส่วนตัวตามสิทธิ์ที่แอดมินอนุญาต':'ซ่อนรหัสนักเรียน เบอร์โทร และคะแนนตามสิทธิ์ที่แอดมินกำหนด';}
+  const expectedDirectoryKey=`${SESSION._authUid||SESSION.username}:${SESSION.role}:${canViewPersonalData?'personal':'basic'}`;
+  if(!isAdmin&&_classDirectorySessionKey&&_classDirectorySessionKey!==expectedDirectoryKey)clearClassDirectory();
+  if(!hasRolePermission('class')){
     content.style.display='none';wall.style.display='flex';return;
   }
   content.style.display='block';wall.style.display='none';
+  if(!isAdmin&&CLASS_DIRECTORY_STATUS==='idle')loadClassDirectory();
+  const list=document.getElementById('class-list');
+  if(!isAdmin&&CLASS_DIRECTORY_STATUS==='loading'){
+    document.getElementById('class-stats').innerHTML='';list.innerHTML='<div class="empty-state">กำลังโหลดรายชื่อนักเรียน…</div>';return;
+  }
+  if(!isAdmin&&CLASS_DIRECTORY_STATUS==='error'){
+    document.getElementById('class-stats').innerHTML='';list.innerHTML=`<div class="empty-state">โหลดรายชื่อไม่สำเร็จ: ${escapeHtml(CLASS_DIRECTORY_ERROR||'กรุณาลองใหม่')}</div>`;return;
+  }
 
-  const q=(document.getElementById('classSearch')?.value||'').toLowerCase();
+  const q=(document.getElementById('classSearch')?.value||'').trim().toLowerCase();
+  const searchInput=document.getElementById('classSearch');
+  if(searchInput)searchInput.placeholder=canViewPersonalData?'ค้นหาชื่อหรือรหัส...':'ค้นหาชื่อนักเรียน...';
   const roomFilter=document.getElementById('classFilterRoom')?.value||'';
-  const sortMode=document.getElementById('classSort')?.value||'number_asc';
+  const sortSelect=document.getElementById('classSort');
+  const sortMode=sortSelect?.value||'number_asc';
+  if(sortSelect)sortSelect.querySelectorAll('option[value^="score_"]').forEach(option=>option.hidden=!canViewPersonalData);
+  if(!canViewPersonalData&&sortMode.startsWith('score_')&&sortSelect)sortSelect.value='number_asc';
+  const source=isAdmin?MEMBERS:CLASS_DIRECTORY;
+  let arr=Object.entries(source||{});
+  if(q)arr=arr.filter(([,m])=>String(m.name||'').toLowerCase().includes(q)||(canViewPersonalData&&String(m.studentId||'').includes(q)));
+  if(roomFilter)arr=arr.filter(([,m])=>String(m.classroom||'')===roomFilter);
 
-  let arr=Object.entries(MEMBERS);
-
-  // Filter by search
-  if(q) arr=arr.filter(([,m])=>(m.name||'').toLowerCase().includes(q)||(m.studentId||'').includes(q));
-  // Filter by room
-  if(roomFilter) arr=arr.filter(([,m])=>String(m.classroom||'')===roomFilter);
-
-  // Sort
   arr.sort((a,b)=>{
     const[,ma]=a,[,mb]=b;
-    switch(sortMode){
-      case 'number_asc': return compareMembersByOrder(ma, mb);
-      case 'name_asc': return (ma.name||'').localeCompare(mb.name||'', 'th');
-      case 'name_desc': return (mb.name||'').localeCompare(ma.name||'', 'th');
-      case 'score_desc': return (parseInt(mb.scores?.total||0))-(parseInt(ma.scores?.total||0));
-      case 'score_asc': return (parseInt(ma.scores?.total||0))-(parseInt(mb.scores?.total||0));
-      case 'role': {
-        const roleOrder={admin:0,student:1,guest:2};
-        return (roleOrder[ma.role]||99)-(roleOrder[mb.role]||99);
-      }
-      default: return compareMembersByOrder(ma, mb);
+    switch(sortSelect?.value||sortMode){
+      case 'number_asc': return compareMembersByOrder(ma,mb);
+      case 'name_asc': return String(ma.name||'').localeCompare(String(mb.name||''),'th');
+      case 'name_desc': return String(mb.name||'').localeCompare(String(ma.name||''),'th');
+      case 'score_desc': return canViewPersonalData?(parseFloat(mb.scores?.total||0)-parseFloat(ma.scores?.total||0)):0;
+      case 'score_asc': return canViewPersonalData?(parseFloat(ma.scores?.total||0)-parseFloat(mb.scores?.total||0)):0;
+      case 'role': {const order={admin:0,student:1,guest:2};return (order[ma.role]??99)-(order[mb.role]??99);}
+      default: return compareMembersByOrder(ma,mb);
     }
   });
 
-  document.getElementById('class-stats').innerHTML=`<div style="display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap;"><span class="tag" style="background:rgba(34,211,238,.1);color:var(--accent2);border:1px solid rgba(34,211,238,.2)"><i data-lucide="users" class="inline-ico"></i> ${arr.length} คน</span><span class="tag" style="background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)"><i data-lucide="star" class="inline-ico"></i> ${arr.filter(([,m])=>m.role==='admin').length} Admin</span></div>`;
+  const adminCount=arr.filter(([,m])=>String(m.role||'').toLowerCase()==='admin').length;
+  document.getElementById('class-stats').innerHTML=`<div style="display:flex;gap:8px;margin-bottom:4px;flex-wrap:wrap;"><span class="tag" style="background:rgba(34,211,238,.1);color:var(--accent2);border:1px solid rgba(34,211,238,.2)"><i data-lucide="users" class="inline-ico"></i> ${arr.length} คน</span>${canViewPersonalData?`<span class="tag" style="background:rgba(251,191,36,.1);color:var(--gold);border:1px solid rgba(251,191,36,.2)"><i data-lucide="star" class="inline-ico"></i> ${adminCount} Admin</span>`:''}</div>`;
+  if(!arr.length){list.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลสมาชิก<br>Admin ต้องเพิ่มรายชื่อก่อน</div>';ensureLucideIcons(content);return;}
 
-  if(!arr.length){document.getElementById('class-list').innerHTML='<div class="empty-state">ยังไม่มีข้อมูลสมาชิก<br>Admin ต้องเพิ่มรายชื่อก่อน</div>';ensureLucideIcons(content);return;}
-
-  document.getElementById('class-list').innerHTML=arr.map(([uid,m])=>{
-    const scores = recalculateStudentScores(m.scores || {});
-    const scoreHtml = (scores.good || scores.bad || scores.total)
-      ? `<div class="student-score" style="display:flex;flex-direction:column;gap:4px;min-width:80px;text-align:right;">` +
-          `${scores.good != null ? `<span style="color:var(--green);font-weight:700">${scores.good}</span>` : ''}` +
-          `${scores.bad != null ? `<span style="color:var(--red);font-weight:700">${scores.bad}</span>` : ''}` +
-          `${scores.total != null ? `<span style="color:var(--purple);font-weight:700">${scores.total}</span>` : ''}` +
-        `</div>`
-      : '';
-    return `<div class="student-item" onclick="openStudentModal('${uid}')"><div class="student-avatar">${avatarEmoji(m)}</div><div class="student-info"><div class="student-name">${m.name||'—'}${'<span class="name-tag"> -- '+(m.tag||'นักเรียน')+'</span>'}</div><div class="student-meta">${m.studentNumber!=null?`เลขที่ ${m.studentNumber} · `:''}รหัส ${m.studentId||'—'}${m.classroom?' · ม.'+m.classroom:''} · ${m.tel||'—'}</div><div style="margin-top:4px">${roleBadge(m.role,'sm')}</div></div>${scoreHtml}</div>`;
+  list.innerHTML=arr.map(([uid,m])=>{
+    const displayName=escapeHtml(m.name||'—');
+    const displayTag=escapeHtml(m.tag||'นักเรียน');
+    const room=m.classroom?` · ม.${escapeHtml(m.classroom)}`:'';
+    const number=m.studentNumber!=null?`เลขที่ ${escapeHtml(String(m.studentNumber))} · `:'';
+    let scoreHtml='';
+    if(canViewPersonalData){
+      const scores=recalculateStudentScores(m.scores||{});
+      if(scores.good||scores.bad||scores.total)scoreHtml=`<div class="student-score" style="display:flex;flex-direction:column;gap:4px;min-width:80px;text-align:right;">${scores.good!=null?`<span style="color:var(--green);font-weight:700">${escapeHtml(String(scores.good))}</span>`:''}${scores.bad!=null?`<span style="color:var(--red);font-weight:700">${escapeHtml(String(scores.bad))}</span>`:''}${scores.total!=null?`<span style="color:var(--purple);font-weight:700">${escapeHtml(String(scores.total))}</span>`:''}</div>`;
+    }
+    const adminMeta=canViewPersonalData?`รหัส ${escapeHtml(m.studentId||'—')}${room}${m.tel?` · ${escapeHtml(m.tel)}`:''}`:`${number}${m.classroom?`ม.${escapeHtml(m.classroom)}`:'ไม่ระบุห้อง'}`;
+    return `<div class="student-item" data-student-uid="${escapeHtml(uid)}"><div class="student-avatar">${avatarEmoji(m)}</div><div class="student-info"><div class="student-name">${displayName}<span class="name-tag"> -- ${displayTag}</span></div><div class="student-meta">${adminMeta}</div><div style="margin-top:4px">${roleBadge(String(m.role||'guest').toLowerCase(),'sm')}</div></div>${scoreHtml}</div>`;
   }).join('');
+  list.querySelectorAll('[data-student-uid]').forEach(row=>row.addEventListener('click',()=>openStudentModal(row.dataset.studentUid)));
   ensureLucideIcons(content);
 }
 
 function openStudentModal(uid){
-  const m=MEMBERS[uid];if(!m)return;
-  const s=m.scores||{};
-  document.getElementById('student-modal-body').innerHTML=`<div style="text-align:center;padding-bottom:20px;border-bottom:1px solid var(--border)"><div style="font-size:50px;margin-bottom:10px">${avatarEmoji(m)}</div><div style="font-size:18px;font-weight:700">${m.name||'—'}${'<span class="name-tag"> -- '+(m.tag||'นักเรียน')+'</span>'}</div><div style="font-size:12px;color:var(--text2);margin-top:3px">รหัส ${m.studentId||'—'}</div><div style="margin-top:8px">${roleBadge(m.role)}</div></div><div style="padding-top:16px"><div class="profile-row"><span class="pk"><i data-lucide=\"phone\" class=\"inline-ico\"></i> เบอร์โทร</span><span class="pv">${m.tel||'—'}</span></div><div class="profile-row"><span class="pk"><i data-lucide=\"school\" class=\"inline-ico\"></i> ชั้น/ห้อง</span><span class="pv">${m.classroom ? 'ม.' + m.classroom : '—'}</span></div><div class="profile-row"><span class="pk"><i data-lucide=\"smile\" class=\"inline-ico\"></i> ความดี</span><span class="pv" style="color:var(--green)">${s.good||'0'}</span></div><div class="profile-row"><span class="pk"><i data-lucide=\"frown\" class=\"inline-ico\"></i> ตัดคะแนน</span><span class="pv" style="color:var(--red)">${s.bad||'0'}</span></div><div class="profile-row"><span class="pk"><i data-lucide=\"star\" class=\"inline-ico\"></i> สรุปรวม</span><span class="pv" style="color:var(--purple)">${s.total||'0'}</span></div></div>`;
-  ensureLucideIcons(document.getElementById('student-modal-body'));
+  if(!SESSION)return;
+  const isAdmin=SESSION._isAdminAC===true;
+  const canViewPersonalData=isAdmin||hasRolePermission('personalData');
+  const m=(isAdmin?MEMBERS:CLASS_DIRECTORY)[uid];if(!m)return;
+  const body=document.getElementById('student-modal-body');
+  const name=escapeHtml(m.name||'—');
+  const tag=escapeHtml(m.tag||'นักเรียน');
+  const room=escapeHtml(m.classroom||'—');
+  const number=m.studentNumber!=null?escapeHtml(String(m.studentNumber)):'—';
+  const identity=canViewPersonalData?`<div style="font-size:12px;color:var(--text2);margin-top:3px">รหัส ${escapeHtml(m.studentId||'—')}</div>`:'';
+  const details=canViewPersonalData
+    ?`<div class="profile-row"><span class="pk"><i data-lucide="phone" class="inline-ico"></i> เบอร์โทร</span><span class="pv">${escapeHtml(m.tel||'—')}</span></div><div class="profile-row"><span class="pk"><i data-lucide="school" class="inline-ico"></i> ชั้น/ห้อง</span><span class="pv">${m.classroom?'ม.':''}${room}</span></div><div class="profile-row"><span class="pk"><i data-lucide="smile" class="inline-ico"></i> ความดี</span><span class="pv" style="color:var(--green)">${escapeHtml(String(m.scores?.good||'0'))}</span></div><div class="profile-row"><span class="pk"><i data-lucide="frown" class="inline-ico"></i> ตัดคะแนน</span><span class="pv" style="color:var(--red)">${escapeHtml(String(m.scores?.bad||'0'))}</span></div><div class="profile-row"><span class="pk"><i data-lucide="star" class="inline-ico"></i> สรุปรวม</span><span class="pv" style="color:var(--purple)">${escapeHtml(String(recalculateStudentScores(m.scores||{}).total||'0'))}</span></div>`
+    :`<div class="profile-row"><span class="pk"><i data-lucide="list-ordered" class="inline-ico"></i> เลขที่</span><span class="pv">${number}</span></div><div class="profile-row"><span class="pk"><i data-lucide="school" class="inline-ico"></i> ชั้น/ห้อง</span><span class="pv">${m.classroom?'ม.':''}${room}</span></div>`;
+  body.innerHTML=`<div style="text-align:center;padding-bottom:20px;border-bottom:1px solid var(--border)"><div style="font-size:50px;margin-bottom:10px">${avatarEmoji(m)}</div><div style="font-size:18px;font-weight:700">${name}<span class="name-tag"> -- ${tag}</span></div>${identity}<div style="margin-top:8px">${roleBadge(String(m.role||'guest').toLowerCase())}</div></div><div style="padding-top:16px">${details}</div>`;
+  ensureLucideIcons(body);
   openModal('studentModal');
 }
-
 /* ── INLINE SVG ICONS (for dynamic HTML - no lucide delay) ── */
 const SVG_ICONS = {
   'check': `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;display:inline"><polyline points="20 6 9 17 4 12"></polyline></svg>`,
@@ -2473,15 +2533,17 @@ function setWalletFilter(filter, element) {
 function onPayMonthChange(){
   const month=parseInt(document.getElementById('payMonthDropdown').value);
   CUR_PAY_MONTH=month;
-  CUR_PAY_WEEK=1;
+  CUR_PAY_WEEK=getSuggestedPaymentWeek(CUR_PAY_YEAR||getCurrentYear(),month);
+  CUR_PAY_WEEK_MANUAL=false;
   // รีเซ็ต week dropdown เป็น placeholder รอ lazy populate
   const wkDD=document.getElementById('payWeekDropdown');
-  if(wkDD){ wkDD.innerHTML='<option value="1">สัปดาห์ที่ 1</option>'; wkDD.value='1'; }
+  if(wkDD){ wkDD.innerHTML=`<option value="${CUR_PAY_WEEK}">สัปดาห์ที่ ${CUR_PAY_WEEK}</option>`; wkDD.value=String(CUR_PAY_WEEK); }
   renderPayTable();
 }
 
 function onPayWeekChange(){
   CUR_PAY_WEEK=parseInt(document.getElementById('payWeekDropdown').value);
+  CUR_PAY_WEEK_MANUAL=true;
   renderPayTable();
 }
 
@@ -2489,11 +2551,17 @@ function renderPayment(){
   if(!SESSION)return;
   const content=document.getElementById('pay-content');
   const wall=document.getElementById('pay-guest-wall');
-  if(SESSION.role==='guest'&&!PERMS.pay){content.style.display='none';wall.style.display='flex';return;}
+  if(!hasRolePermission('pay')){clearPaymentDirectory();content.style.display='none';wall.style.display='flex';return;}
+  if(SESSION._isAdminAC===true)clearPaymentDirectory();
+  else startPaymentDirectoryRefresh();
   content.style.display='block';wall.style.display='none';
 
   if(!CUR_PAY_MONTH) CUR_PAY_MONTH=new Date().getMonth()+1;
-  if(!CUR_PAY_WEEK) CUR_PAY_WEEK=1;
+  if(!CUR_PAY_WEEK_MANUAL){
+    CUR_PAY_WEEK=getSuggestedPaymentWeek(CUR_PAY_YEAR||getCurrentYear(),CUR_PAY_MONTH);
+  }else if(!CUR_PAY_WEEK){
+    CUR_PAY_WEEK=1;
+  }
 
   // Sync month dropdown value (options are static in HTML — no innerHTML re-render)
   const mDD=document.getElementById('payMonthDropdown');
@@ -2514,9 +2582,28 @@ function renderPayment(){
 
 function renderPayTable(){
   if(!CUR_PAY_MONTH || !CUR_PAY_WEEK) return;
+  const isAdmin=SESSION?._isAdminAC===true;
+  if(!isAdmin){
+    const expectedKey=`${SESSION?._authUid||SESSION?.username}:${SESSION?.role}:${hasRolePermission('personalData')?'personal':'basic'}`;
+    if(_paymentDirectorySessionKey&&_paymentDirectorySessionKey!==expectedKey)clearPaymentDirectory();
+    if(PAYMENT_DIRECTORY_STATUS==='idle')loadPaymentDirectory();
+    if(PAYMENT_DIRECTORY_STATUS==='loading'){
+      document.getElementById('pay-stats-row').innerHTML='';
+      document.getElementById('pay-header-week-total').textContent='💰 กำลังโหลดยอด…';
+      document.getElementById('pay-list').innerHTML='<div class="empty-state">กำลังโหลดรายชื่อและยอดเงินห้อง…</div>';
+      return;
+    }
+    if(PAYMENT_DIRECTORY_STATUS==='error'){
+      document.getElementById('pay-stats-row').innerHTML='';
+      document.getElementById('pay-header-week-total').textContent='💰 โหลดข้อมูลไม่สำเร็จ';
+      document.getElementById('pay-list').innerHTML=`<div class="empty-state">โหลดข้อมูลเงินห้องไม่สำเร็จ: ${escapeHtml(PAYMENT_DIRECTORY_ERROR||'กรุณาลองรีเฟรช')}</div>`;
+      return;
+    }
+  }
   const year=CUR_PAY_YEAR||getCurrentYear();
   const month=CUR_PAY_MONTH;
   const week=CUR_PAY_WEEK;
+  const periodKey=`${year}_${month}_${week}`;
   const targetFee=getWeekFee(year, month, week);
 
   document.getElementById('pay-sub-title').textContent=`${MONTHS[month-1]} ${year} · สัปดาห์ที่ ${week} (ค่าห้อง ${targetFee}฿)`;
@@ -2525,11 +2612,13 @@ function renderPayTable(){
 
 
   // คำนวณยอดรวมสัปดาห์นี้
-  const _weekTotal = Object.values(PAYMENTS).filter(p=>
-    String(p.year||getCurrentYear())===String(year) &&
-    String(p.month)===String(month) &&
-    String(p.week)===String(week)
-  ).reduce((s,p)=>s+parseFloat(p.amount||0),0);
+  const _weekTotal = isAdmin
+    ? Object.values(PAYMENTS).filter(p=>
+        String(p.year||getCurrentYear())===String(year) &&
+        String(p.month)===String(month) &&
+        String(p.week)===String(week)
+      ).reduce((s,p)=>s+parseFloat(p.amount||0),0)
+    : Number(PAYMENT_DIRECTORY_PERIOD_TOTALS[periodKey]||0);
   // คำนวณยอดรวมทั้งหมดทุกสัปดาห์ทุกเดือน
   const _allTotal = Object.values(PAYMENTS).reduce((s,p)=>s+parseFloat(p.amount||0),0);
   const _wkEl = document.getElementById('pay-header-week-total');
@@ -2537,14 +2626,20 @@ function renderPayTable(){
   renderFinanceSummary(); // อัปเดต badge รวมสุทธิ (หักค่าใช้จ่ายและเงินยืม)
 
   const studentPaidRecordMap = {};
-  Object.values(PAYMENTS).forEach(p=>{
-    if(String(p.year||getCurrentYear())===String(year) && String(p.month)===String(month) && String(p.week)===String(week)) {
-      const sId = String(p.studentId);
-      studentPaidRecordMap[sId] = (studentPaidRecordMap[sId] || 0) + parseFloat(p.amount || 0);
-    }
-  });
+  if(isAdmin){
+    Object.values(PAYMENTS).forEach(p=>{
+      if(String(p.year||getCurrentYear())===String(year) && String(p.month)===String(month) && String(p.week)===String(week)) {
+        const sId=String(p.studentId);
+        studentPaidRecordMap[sId]=(studentPaidRecordMap[sId]||0)+parseFloat(p.amount||0);
+      }
+    });
+  }
 
-  let mbs=Object.values(MEMBERS).sort(compareMembersByOrder);
+  const memberSource=isAdmin?MEMBERS:PAYMENT_DIRECTORY.members;
+  let mbs=Object.entries(memberSource||{}).map(([uid,member])=>({...member,_directoryKey:uid})).sort(compareMembersByOrder);
+  if(!isAdmin){
+    for(const m of mbs)m._paidAmount=Number(PAYMENT_DIRECTORY.paymentTotals?.[m._directoryKey]?.[periodKey]||0);
+  }
   if(roomFilter) mbs=mbs.filter(m=>String(m.classroom||'')===roomFilter);
 
   let paidCount = 0;
@@ -2552,7 +2647,7 @@ function renderPayTable(){
   let incompleteCount = 0;
 
   mbs.forEach(m => {
-    const paidAmt = studentPaidRecordMap[String(m.studentId)] || 0;
+    const paidAmt = isAdmin?(studentPaidRecordMap[String(m.studentId)]||0):(m._paidAmount||0);
     if(paidAmt >= targetFee) paidCount++;
     else if(paidAmt > 0 && paidAmt < targetFee) incompleteCount++;
     else unpaidCount++;
@@ -2579,7 +2674,7 @@ function renderPayTable(){
   let matchCount = 0;
 
   mbs.forEach(m => {
-    const paidAmt = studentPaidRecordMap[String(m.studentId)] || 0;
+    const paidAmt = isAdmin?(studentPaidRecordMap[String(m.studentId)]||0):(m._paidAmount||0);
     let statusClass = 'unpaid';
     let statusText = `${svgIco('x')} ยังไม่จ่าย (0/${targetFee}฿)`;
 
@@ -2599,12 +2694,18 @@ function renderPayTable(){
 
     if (shouldRender) {
       matchCount++;
+      const canViewStudentId=isAdmin||hasRolePermission('personalData');
+      const studentMeta=[
+        m.studentNumber!=null?`เลขที่ ${escapeHtml(m.studentNumber)}`:'',
+        canViewStudentId&&m.studentId?`รหัส ${escapeHtml(m.studentId)}`:'',
+        m.classroom?`ม.${escapeHtml(m.classroom)}`:''
+      ].filter(Boolean).join(' · ');
       renderedHTML += `
         <div class="pay-row">
           <div class="student-avatar" style="width:36px;height:36px;font-size:18px;flex-shrink:0">${avatarEmoji(m)}</div>
           <div class="pay-name">
-            ${m.name||'—'}
-            <div style="font-size:11px; font-weight:400; color:var(--text2); margin-top:2px;">${m.studentNumber!=null?`เลขที่ ${m.studentNumber} · `:''}รหัส ${m.studentId}${m.classroom?' · ม.'+m.classroom:''}</div>
+            ${escapeHtml(m.name||'—')}
+            ${studentMeta?`<div style="font-size:11px; font-weight:400; color:var(--text2); margin-top:2px;">${studentMeta}</div>`:''}
           </div>
           <div class="pay-status ${statusClass}">${statusText}</div>
         </div>
@@ -2621,7 +2722,7 @@ function openHistoryModal(){openModal('historyModal');renderHistory();}
 function renderHistory(){
   const el=document.getElementById('history-modal-body');
   if(!SESSION){el.innerHTML='<div class="empty-state">กรุณาเข้าสู่ระบบก่อน</div>';return;}
-  if(SESSION?.role==='guest'&&!PERMS.history){el.innerHTML='<div class="empty-state"><i data-lucide="lock" class="inline-ico"></i> ไม่มีสิทธิ์ดูประวัติ</div>';ensureLucideIcons(el);return;}
+  if(!hasRolePermission('history')){el.innerHTML='<div class="empty-state"><i data-lucide="lock" class="inline-ico"></i> ไม่มีสิทธิ์ดูประวัติ</div>';ensureLucideIcons(el);return;}
   const arr=Object.entries(PAYMENTS).filter(([,p])=>SESSION.role==='admin'||String(p.studentId??'')===String(SESSION.username)).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
   if(!arr.length){el.innerHTML='<div class="empty-state"><i data-lucide="clipboard" class="inline-ico"></i> ยังไม่มีประวัติ</div>';ensureLucideIcons(el);return;}
   el.innerHTML=arr.map(([,p])=>{
@@ -2629,20 +2730,20 @@ function renderHistory(){
     const avatar = avatarEmoji(member || p.studentId);
     const nameWithTag = member ? (escapeHtml(member.name||member.studentId) + (member.tag? ('<span class="name-tag"> -- '+escapeHtml(member.tag)+'</span>') : '')) : escapeHtml(p.studentName||p.studentId);
     const dateStr = p.ts?new Date(p.ts).toLocaleDateString('th-TH',{year:'numeric',month:'short',day:'numeric'}):'—';
-    return `<div class="history-item"><div class="history-icon in">${avatar}</div><div class="history-info"><div class="history-title">${nameWithTag} · ${MONTHS[(p.month||1)-1]} ${p.year||getCurrentYear()} ส.${p.week||'?'}</div><div class="history-sub">${dateStr}${p.note?' · '+escapeHtml(p.note):''} · บันทึกโดย ${escapeHtml(p.by||'—')}</div></div><div class="history-amt in">+${p.amount||0}฿</div></div>`;
+    return `<div class="history-item"><div class="history-icon in">${avatar}</div><div class="history-info"><div class="history-title">${nameWithTag} · ${MONTHS[(p.month||1)-1]} ${p.year||getCurrentYear()} ส.${p.week||'?'}</div><div class="history-sub">${dateStr}${p.note?' · '+escapeHtml(p.note):''} · บันทึกโดย ${escapeHtml(p.by||'—')}</div></div><div class="history-amt" style="color:${paymentMovementColor(p)}">${formatPaymentMovement(p)}</div></div>`;
   }).join('');
   ensureLucideIcons(el);
 }
 
 /* ── ADMIN PANEL FUNCTIONS ── */
 function switchAdminTab(tab){
-  const tabNames=['members','payment','finance','walletcfg','perms','admins','cmd'];
+  const tabNames=['members','payment','finance','walletcfg','perms','admins','cmd','storage','audit','health'];
   if(!tabNames.includes(tab)) tab='members';
   document.querySelectorAll('.admin-tabs .admin-tab').forEach((b,i)=>{
     b.className='admin-tab'+(tabNames[i]===tab?' active':'');
   });
-  ['ap-members','ap-payment','ap-finance','ap-walletcfg','ap-perms','ap-admins','ap-cmd'].forEach(id=>document.getElementById(id).className='admin-panel');
-  const map={members:'ap-members',payment:'ap-payment',finance:'ap-finance',walletcfg:'ap-walletcfg',perms:'ap-perms',admins:'ap-admins',cmd:'ap-cmd'};
+  ['ap-members','ap-payment','ap-finance','ap-walletcfg','ap-perms','ap-admins','ap-cmd','ap-storage','ap-audit','ap-health'].forEach(id=>document.getElementById(id).className='admin-panel');
+  const map={members:'ap-members',payment:'ap-payment',finance:'ap-finance',walletcfg:'ap-walletcfg',perms:'ap-perms',admins:'ap-admins',cmd:'ap-cmd',storage:'ap-storage',audit:'ap-audit',health:'ap-health'};
   document.getElementById(map[tab]).className='admin-panel active';
 
   if(tab === 'members') {
@@ -2663,6 +2764,176 @@ function switchAdminTab(tab){
   }
   if(tab === 'admins') renderAdminAccounts();
   if(tab === 'perms') applyPermsUI();
+  if(tab === 'storage') refreshStoragePage();
+  if(tab === 'audit') loadAuditLog();
+  if(tab === 'health') loadSystemHealth();
+}
+
+function formatStorageBytes(value){
+  const bytes=Math.max(0,Number(value)||0);
+  if(bytes<1024)return `${bytes} B`;
+  const units=['KB','MB','GB','TB'];
+  let size=bytes/1024,index=0;
+  while(size>=1024&&index<units.length-1){size/=1024;index++;}
+  return `${size.toLocaleString('th-TH',{maximumFractionDigits:1})} ${units[index]}`;
+}
+
+function formatStorageDate(value){
+  const timestamp=Number(value);
+  if(!Number.isFinite(timestamp)||timestamp<=0)return '—';
+  return new Date(timestamp).toLocaleString('th-TH',{dateStyle:'medium',timeStyle:'short'});
+}
+
+function renderStoragePage(){
+  const statsEl=document.getElementById('storage-stat-grid');
+  const listEl=document.getElementById('storage-backup-list');
+  const countEl=document.getElementById('storage-backup-count');
+  if(!statsEl||!listEl)return;
+  const backups=STORAGE_BACKUPS.slice().sort((a,b)=>(Number(b.createdAt)||0)-(Number(a.createdAt)||0));
+  const totalBytes=backups.reduce((sum,item)=>sum+(Number(item.sizeBytes)||0),0);
+  const latest=backups[0];
+  statsEl.innerHTML=`
+    <div class="storage-stat-card"><div class="storage-stat-label">โปรไฟล์สำรอง</div><div class="storage-stat-value">${backups.length}</div></div>
+    <div class="storage-stat-card"><div class="storage-stat-label">ขนาดสำรองรวมโดยประมาณ</div><div class="storage-stat-value">${formatStorageBytes(totalBytes)}</div></div>
+    <div class="storage-stat-card"><div class="storage-stat-label">สำรองล่าสุด</div><div class="storage-stat-value" style="font-size:14px">${latest?escapeHtml(formatStorageDate(latest.createdAt)):'ยังไม่มีข้อมูล'}</div></div>
+    <div class="storage-stat-card"><div class="storage-stat-label">ข้อมูลที่โหลดในเว็บ</div><div class="storage-stat-value" style="font-size:15px">${Object.keys(MEMBERS||{}).length} สมาชิก · ${Object.keys(PAYMENTS||{}).length} รายการเงิน</div></div>`;
+  if(countEl)countEl.textContent=`${backups.length} รายการ`;
+  if(STORAGE_LOAD_STATE==='loading'){
+    listEl.innerHTML='<div class="card glass-panel" style="color:var(--text2);font-size:12px">กำลังเชื่อมต่อ RTDB สำรอง…</div>';
+    return;
+  }
+  if(STORAGE_LOAD_STATE==='error'){
+    listEl.innerHTML=`<div class="card glass-panel" style="color:var(--red);font-size:12px">${escapeHtml(STORAGE_LOAD_ERROR||'โหลดรายการสำรองไม่สำเร็จ')}</div>`;
+    return;
+  }
+  if(!backups.length){
+    listEl.innerHTML='<div class="card glass-panel" style="color:var(--text2);font-size:12px">ยังไม่มีโปรไฟล์สำรอง กด “สำรองตอนนี้” เพื่อสร้างรายการแรก</div>';
+    return;
+  }
+  listEl.innerHTML=backups.map(item=>{
+    const id=String(item.id||'');
+    const safeId=/^bk_[0-9]{10,14}_[a-f0-9]{12}$/.test(id)?id:'';
+    const chips=[`${Number(item.members)||0} สมาชิก`,`${Number(item.payments)||0} รายการเงิน`,`${Number(item.expenses)||0} ค่าใช้จ่าย`,`${Number(item.loans)||0} รายการยืม`,`${Number(item.incomes)||0} รายการรับ`,formatStorageBytes(item.sizeBytes)]
+      .map(value=>`<span class="storage-backup-chip">${escapeHtml(value)}</span>`).join('');
+    return `<article class="storage-backup-row"><div class="storage-backup-info"><div class="storage-backup-name">${escapeHtml(item.name||'สำรองข้อมูล')}</div><div class="storage-backup-meta">${escapeHtml(formatStorageDate(item.createdAt))} · สำรองโดย ${escapeHtml(item.createdBy||'—')}</div><div class="storage-backup-stats">${chips}</div></div><div class="storage-backup-actions"><button class="btn btn-sm btn-outline" type="button" style="color:var(--red);border-color:var(--red)" ${!safeId||STORAGE_BUSY?'disabled':''} onclick="deleteStorageBackup('${safeId}')"><i data-lucide="trash-2" class="btn-ico"></i> ลบ</button><button class="btn btn-sm btn-outline" type="button" ${!safeId||STORAGE_BUSY?'disabled':''} onclick="restoreStorageBackup('${safeId}')"><i data-lucide="rotate-ccw" class="btn-ico"></i> โหลดข้อมูลชุดนี้</button></div></article>`;
+  }).join('');
+  ensureLucideIcons(listEl);
+}
+
+function setStorageBusy(isBusy){
+  STORAGE_BUSY=!!isBusy;
+  ['storage-create-btn','storage-refresh-btn'].forEach(id=>{
+    const button=document.getElementById(id);
+    if(button)button.disabled=STORAGE_BUSY;
+  });
+  renderStoragePage();
+}
+
+async function refreshStoragePage(){
+  const status=document.getElementById('storage-status');if(!status||STORAGE_BUSY)return;
+  const refreshBtn=document.getElementById('storage-refresh-btn');if(refreshBtn)refreshBtn.disabled=true;
+  STORAGE_LOAD_STATE='loading';STORAGE_LOAD_ERROR='';renderStoragePage();
+  status.textContent='กำลังโหลดรายการจาก API…';
+  try{const result=await apiPost({action:'storageList'},true);STORAGE_BACKUPS=Array.isArray(result.backups)?result.backups:[];STORAGE_LOAD_STATE='ready';STORAGE_LOAD_ERROR='';status.textContent='เชื่อมต่อ RTDB สำรองแล้ว';status.style.color='var(--text2)';renderStoragePage();}
+  catch(error){const message=error.message||'โหลดรายการสำรองไม่สำเร็จ';STORAGE_LOAD_STATE='error';STORAGE_LOAD_ERROR=message;status.textContent=message;status.style.color='var(--red)';renderStoragePage();reportHealthError('backupDatabase',error);}
+  finally{if(refreshBtn)refreshBtn.disabled=false;}
+}
+async function createStorageBackup(){
+  if(STORAGE_BUSY)return;if(!SESSION?._isAdminAC){alert('เมนูนี้ใช้ได้เฉพาะบัญชีแอดมิน');return;}
+  const labelInput=document.getElementById('storage-backup-name');const name=(labelInput?.value||'').trim();
+  if(!confirm('สร้าง backup ของข้อมูลระบบปัจจุบันไปยัง RTDB สำรองหรือไม่?'))return;
+  setStorageBusy(true);const status=document.getElementById('storage-status');if(status)status.textContent='กำลังสำรองและตรวจสอบ checksum…';
+  try{const result=await apiPost({action:'storageCreate',name},true);if(result.backup)STORAGE_BACKUPS.unshift(result.backup);if(labelInput)labelInput.value='';if(status)status.textContent=`สำรองและตรวจสอบสำเร็จ · ${formatStorageDate(result.backup.createdAt)} · ${formatStorageBytes(result.backup.sizeBytes)}${result.auditWarning?' · แต่บันทึกประวัติการแก้ไขไม่สำเร็จ':''}`;renderStoragePage();}
+  catch(error){if(status)status.textContent=error.message||'สำรองข้อมูลไม่สำเร็จ';reportHealthError('backupDatabase',error);}
+  finally{setStorageBusy(false);}
+}
+async function deleteStorageBackup(id){
+  if(STORAGE_BUSY)return;if(!SESSION?._isAdminAC)return alert('เมนูนี้ใช้ได้เฉพาะบัญชีแอดมิน');
+  if(!/^bk_[0-9]{10,14}_[a-f0-9]{12}$/.test(String(id||'')))return;
+  const item=STORAGE_BACKUPS.find(backup=>String(backup.id)===String(id));if(!item)return;
+  if(!confirm(`ยืนยันลบโปรไฟล์สำรอง “${item.name||'สำรองข้อมูล'}” หรือไม่?\n\nลบแล้วจะกู้คืนโปรไฟล์นี้ไม่ได้`))return;
+  setStorageBusy(true);const status=document.getElementById('storage-status');if(status)status.textContent='กำลังลบโปรไฟล์สำรอง…';
+  try{await apiPost({action:'storageDelete',id},true);STORAGE_BACKUPS=STORAGE_BACKUPS.filter(backup=>String(backup.id)!==String(id));if(status)status.textContent=`ลบโปรไฟล์ “${item.name||'สำรองข้อมูล'}” แล้ว`;renderStoragePage();}
+  catch(error){if(status)status.textContent=error.message||'ลบโปรไฟล์สำรองไม่สำเร็จ';reportHealthError('backupDatabase',error);}
+  finally{setStorageBusy(false);}
+}
+async function restoreStorageBackup(id){
+  if(STORAGE_BUSY)return;if(!SESSION?._isAdminAC)return alert('เมนูนี้ใช้ได้เฉพาะบัญชีแอดมิน');
+  const item=STORAGE_BACKUPS.find(backup=>String(backup.id)===String(id));if(!item)return;
+  if(!confirm(`กู้คืนข้อมูลจาก “${item.name||'สำรองข้อมูล'}” หรือไม่?\nระบบจะตรวจ checksum และสร้าง backup ปัจจุบันไว้อัตโนมัติก่อนเขียนทับ`))return;
+  setStorageBusy(true);const status=document.getElementById('storage-status');if(status)status.textContent='กำลังตรวจ checksum และสำรองข้อมูลปัจจุบัน…';
+  try{const result=await apiPost({action:'storageRestore',id},true);if(result.safetyBackup)STORAGE_BACKUPS.unshift(result.safetyBackup);if(status)status.textContent='กู้คืนสำเร็จ · เก็บข้อมูลก่อนกู้คืนไว้อีกชุดแล้ว';renderStoragePage();}
+  catch(error){if(status)status.textContent=error.message||'กู้คืนข้อมูลไม่สำเร็จ';reportHealthError('backupDatabase',error);}
+  finally{setStorageBusy(false);}
+}
+
+let PENDING_MEMBER_IMPORT=[];
+function parseCsvRows(text){
+  const rows=[];let row=[],cell='',quoted=false;const input=String(text||'').replace(/^\uFEFF/,'');
+  for(let i=0;i<input.length;i++){
+    const ch=input[i];
+    if(ch==='"'){if(quoted&&input[i+1]==='"'){cell+='"';i++;}else quoted=!quoted;continue;}
+    if(ch===','&&!quoted){row.push(cell);cell='';continue;}
+    if((ch==='\n'||ch==='\r')&&!quoted){if(ch==='\r'&&input[i+1]==='\n')i++;row.push(cell);if(row.some(value=>String(value).trim()))rows.push(row);row=[];cell='';continue;}
+    cell+=ch;
+  }
+  row.push(cell);if(row.some(value=>String(value).trim()))rows.push(row);return rows;
+}
+function csvCell(value){
+  let text=String(value??'');
+  if(typeof value==='string'&&/^[\s\u0000-\u001f]*[=+@\-]/.test(text))text="'"+text;
+  return `"${text.replace(/"/g,'""')}"`;
+}
+function downloadCsv(filename,headers,rows){
+  const content='\uFEFF'+[headers,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n');
+  const link=document.createElement('a');link.href=URL.createObjectURL(new Blob([content],{type:'text/csv;charset=utf-8'}));link.download=filename;document.body.appendChild(link);link.click();link.remove();setTimeout(()=>URL.revokeObjectURL(link.href),1000);
+}
+function exportDataCsv(type){
+  if(!SESSION?._isAdminAC){alert('ส่งออกข้อมูลได้เฉพาะผู้ดูแลระบบ');return;}
+  if(type==='members'){
+    const headers=['studentId','studentNumber','name','tel','classroom','role','goodScore','badScore','totalScore'];
+    const rows=Object.values(MEMBERS).sort(compareMembersByOrder).map(member=>[member.studentId,member.studentNumber,member.name,member.tel,member.classroom,member.role,member.scores?.good,member.scores?.bad,recalculateStudentScores(member.scores||{}).total]);
+    downloadCsv(`kci-members-${Date.now()}.csv`,headers,rows);return;
+  }
+  const headers=['timestamp','studentId','studentName','year','month','week','amount','note','by'];
+  const rows=Object.values(PAYMENTS).sort((a,b)=>(Number(a.ts)||0)-(Number(b.ts)||0)).map(payment=>[payment.ts,payment.studentId,payment.studentName,payment.year,payment.month,payment.week,payment.amount,payment.note,payment.by]);
+  downloadCsv(`kci-payments-${Date.now()}.csv`,headers,rows);
+}
+async function previewMemberCsv(file){
+  const preview=document.getElementById('member-csv-preview');PENDING_MEMBER_IMPORT=[];
+  if(!file){preview.textContent='';return;}
+  if(file.size>2*1024*1024){preview.textContent='ไฟล์ใหญ่เกิน 2 MB';return;}
+  try{
+    const rows=parseCsvRows(await file.text());if(rows.length<2)throw new Error('ไฟล์ต้องมีแถวหัวตารางและข้อมูลอย่างน้อย 1 แถว');
+    const headers=rows.shift().map(value=>String(value).trim().toLowerCase());
+    const column=(...names)=>headers.findIndex(header=>names.includes(header));
+    const idCol=column('studentid','student id','รหัสนักเรียน','รหัส');const nameCol=column('name','ชื่อ','ชื่อ-นามสกุล');
+    if(idCol<0||nameCol<0)throw new Error('ต้องมีหัวคอลัมน์ studentId และ name (หรือ รหัสนักเรียน และ ชื่อ-นามสกุล)');
+    const roomCol=column('classroom','room','ห้องเรียน','ห้อง');const telCol=column('tel','phone','เบอร์โทร');const numberCol=column('studentnumber','เลขที่','ลำดับ');const roleCol=column('role','ยศ');
+    const existing=new Set(Object.values(MEMBERS).map(member=>String(member.studentId||'')));const seen=new Set();const errors=[];
+    rows.forEach((cells,index)=>{
+      const rowNo=index+2;const studentId=String(cells[idCol]||'').trim();const name=String(cells[nameCol]||'').trim();const classroom=String(roomCol>=0?cells[roomCol]:'4/2').trim()||'4/2';const tel=String(telCol>=0?cells[telCol]:'').trim();const rawRole=String(roleCol>=0?cells[roleCol]:'guest').trim().toLowerCase();
+      if(!studentId||!name){errors.push(`แถว ${rowNo}: ไม่มีรหัสนักเรียนหรือชื่อ`);return;}
+      if(studentId.length>80||name.length>120||classroom.length>24||tel.length>32){errors.push(`แถว ${rowNo}: รหัส ชื่อ ห้อง หรือเบอร์โทรยาวเกินกำหนด`);return;}
+      if([studentId,name,classroom,tel].some(value=>/[<>\u0000-\u001f]/.test(value))){errors.push(`แถว ${rowNo}: พบอักขระที่ไม่อนุญาตในข้อมูล`);return;}
+      if(existing.has(studentId)||seen.has(studentId)){errors.push(`แถว ${rowNo}: รหัส ${studentId} ซ้ำ`);return;}
+      if(rawRole==='admin'){errors.push(`แถว ${rowNo}: นำเข้า role admin ไม่ได้`);return;}
+      if(rawRole&& !['student','guest','นักเรียน','แขก'].includes(rawRole)){errors.push(`แถว ${rowNo}: role ไม่ถูกต้อง`);return;}
+      seen.add(studentId);const record={studentId,name,classroom,role:getEffectiveMemberRole({classroom,role:rawRole==='student'||rawRole==='นักเรียน'?'student':'guest'}),tag:'นักเรียน',createdAt:Date.now()};
+      if(tel)record.tel=tel;
+      if(numberCol>=0&&String(cells[numberCol]||'').trim()){const n=Number(cells[numberCol]);if(!Number.isInteger(n)||n<1)errors.push(`แถว ${rowNo}: เลขที่ต้องเป็นจำนวนเต็มบวก`);else record.studentNumber=n;}
+      PENDING_MEMBER_IMPORT.push(record);
+    });
+    if(errors.length){PENDING_MEMBER_IMPORT=[];preview.innerHTML=`<div style="color:var(--red)">นำเข้าไม่ได้ พบ ${errors.length} จุด:<br>${errors.slice(0,12).map(escapeHtml).join('<br>')}${errors.length>12?'<br>…':''}</div>`;return;}
+    preview.innerHTML=`ตรวจพบ ${PENDING_MEMBER_IMPORT.length} รายชื่อ ไม่พบรหัสซ้ำ <button class="btn btn-sm btn-primary" style="margin-left:8px" onclick="importPendingMembers()">นำเข้ารายชื่อ</button>`;
+  }catch(error){preview.textContent=error.message||'อ่านไฟล์ไม่สำเร็จ';}
+}
+async function importPendingMembers(){
+  if(!SESSION?._isAdminAC||!PENDING_MEMBER_IMPORT.length)return alert('ไม่พบรายชื่อที่ตรวจสอบพร้อมนำเข้า');
+  if(!confirm(`นำเข้าสมาชิก ${PENDING_MEMBER_IMPORT.length} รายการหรือไม่?`))return;
+  const batch=PENDING_MEMBER_IMPORT.slice();const preview=document.getElementById('member-csv-preview');preview.textContent='กำลังนำเข้ารายชื่อ…';
+  try{for(const record of batch)await FUNS.set(FUNS.push(FUNS.ref(DB,'members')),record);PENDING_MEMBER_IMPORT=[];preview.textContent=`นำเข้าสำเร็จ ${batch.length} รายชื่อ`;}
+  catch(error){preview.textContent=`นำเข้าได้บางส่วนแล้ว แต่มีข้อผิดพลาด: ${error.message||'Permission denied'}`;}
 }
 
 async function addMember(){
@@ -2704,17 +2975,59 @@ function renderMemberAdmin(){
     <div class="member-item">
       <div class="student-avatar" style="width:40px;height:40px;font-size:20px">${avatarEmoji(m)}</div>
       <div class="member-info">
-        <div class="member-name">${m.name||'—'}${'<span class="name-tag"> -- '+(m.tag||'นักเรียน')+'</span>'}</div>
-        <div class="student-meta">${m.studentNumber!=null?`เลขที่ ${m.studentNumber} · `:''}รหัส ${m.studentId||'—'}${m.classroom?(' · ม.'+m.classroom):''} · ${m.tel||'—'}</div>
-        <div style="margin-top:4px">${roleBadge(m.role,'sm')}</div>
+        <div class="member-name">${escapeHtml(m.name||'—')}${'<span class="name-tag"> -- '+escapeHtml(m.tag||'นักเรียน')+'</span>'}</div>
+        <div class="student-meta">${m.studentNumber!=null?`เลขที่ ${escapeHtml(m.studentNumber)} · `:''}รหัส ${escapeHtml(m.studentId||'—')}${m.classroom?(' · ม.'+escapeHtml(m.classroom)):''} · ${escapeHtml(m.tel||'—')}</div>
+        <div style="margin-top:4px">${roleBadge(m.role,'sm')}${m.loginDisabled===true?' <span class="name-tag" style="color:var(--red)">เข้าสู่ระบบถูกปิด</span>':''}</div>
       </div>
       <div class="member-actions">
-        <button class="icon-btn" title="แก้ไขข้อมูล" onclick="openEditModal('${uid}')"><i data-lucide="pencil" class="inline-ico"></i></button>
-        <button class="icon-btn danger" title="ลบนักเรียน" onclick="deleteMember('${uid}','${(m.name||'').replace(/'/g,"\\'")}')"><i data-lucide="trash-2" class="inline-ico"></i></button>
+        <button class="icon-btn" title="แก้ไขข้อมูล" onclick="openEditModal('${escapeHtml(uid)}')"><i data-lucide="pencil" class="inline-ico"></i></button>
+        <button class="icon-btn" title="${m.role==='admin'&&m.loginDisabled!==true?'ถอดยศ Admin ก่อนปิดบัญชี':(m.loginDisabled===true?'เปิดการเข้าสู่ระบบ':'ปิดการเข้าสู่ระบบ')}" ${m.role==='admin'&&m.loginDisabled!==true?'disabled':''} onclick="toggleMemberLogin('${escapeHtml(uid)}')"><i data-lucide="${m.loginDisabled===true?'user-round-check':'user-round-x'}" class="inline-ico"></i></button>
+        <button class="icon-btn" title="ดูอุปกรณ์ที่เคยเข้าสู่ระบบ" onclick="openAccountSessions('student','${escapeHtml(uid)}')"><i data-lucide="monitor-smartphone" class="inline-ico"></i></button>
+        <button class="icon-btn" title="ออกจากระบบทุกอุปกรณ์" onclick="revokeMemberSessions('${escapeHtml(uid)}')"><i data-lucide="log-out" class="inline-ico"></i></button>
+        <button class="icon-btn danger" title="ลบนักเรียน" onclick="deleteMember('${escapeHtml(uid)}')"><i data-lucide="trash-2" class="inline-ico"></i></button>
       </div>
     </div>
   `).join('');
   ensureLucideIcons(list);
+}
+
+async function toggleMemberLogin(uid){
+  const member=MEMBERS[uid];if(!member)return;
+  const disabled=member.loginDisabled!==true;
+  const name=member.name||member.studentId||'บัญชีนี้';
+  if(!confirm(`${disabled?'ปิด':'เปิด'}การเข้าสู่ระบบของ ${name} หรือไม่?${disabled?'\n\nระบบจะออกจากระบบบัญชีนี้ในทุกอุปกรณ์':''}`))return;
+  try{await apiPost({action:'memberSetDisabled',uid,disabled},true);alert(disabled?'ปิดการเข้าสู่ระบบแล้ว':'เปิดการเข้าสู่ระบบแล้ว');}
+  catch(error){alert(error.message||'เปลี่ยนสถานะบัญชีนักเรียนไม่สำเร็จ');}
+}
+async function revokeMemberSessions(uid){
+  const member=MEMBERS[uid];if(!member)return;
+  const name=member.name||member.studentId||'บัญชีนี้';
+  if(!confirm(`ออกจากระบบของ ${name} ในทุกอุปกรณ์หรือไม่?`))return;
+  try{await apiPost({action:'memberRevokeSessions',uid},true);alert('ออกจากระบบทุกอุปกรณ์แล้ว');if(SESSION?._memberAdmin&&String(SESSION.username)===String(member.studentId))logout();}
+  catch(error){alert(error.message||'ยกเลิกเซสชันไม่สำเร็จ');}
+}
+async function openAccountSessions(accountType,uid){
+  if(SESSION?.role!=='admin')return alert('เมนูนี้ใช้ได้เฉพาะบัญชีแอดมิน');
+  SESSION_LIST_TARGET={accountType,uid};
+  document.getElementById('session-list-status').textContent='กำลังโหลดอุปกรณ์…';
+  document.getElementById('session-list-content').innerHTML='';
+  openModal('sessionListModal');
+  try{
+    const result=await apiPost({action:'sessionList',accountType,uid},true);
+    document.getElementById('session-list-status').textContent=`บัญชี ${result.account} · ${result.sessions.length} เซสชัน (แสดงล่าสุดไม่เกิน 100)`;
+    const host=document.getElementById('session-list-content');
+    if(!result.sessions.length){host.innerHTML='<div class="empty-state">ยังไม่มีข้อมูลเซสชัน · ระบบจะเริ่มบันทึกเมื่อบัญชีนี้เข้าสู่ระบบหลังอัปเดต</div>';return;}
+    host.innerHTML=result.sessions.map(item=>`<div class="member-item"><div class="member-info"><div class="member-name">${escapeHtml(item.device||'อุปกรณ์')} ${item.current?'<span class="name-tag">· เซสชันนี้</span>':''}</div><div class="student-meta">เข้าสู่ระบบ ${escapeHtml(formatStorageDate(item.createdAt))} · ใช้งานล่าสุด ${escapeHtml(formatStorageDate(item.lastSeenAt))} · ${item.revokedAt?'ยกเลิกแล้ว':'ยังใช้งานได้'}</div></div><div class="member-actions"><button class="btn btn-sm btn-outline" ${item.revokedAt?'disabled':''} onclick="revokeAccountSession('${item.sessionId}')">${item.revokedAt?'ยกเลิกแล้ว':'ยกเลิกเซสชันนี้'}</button></div></div>`).join('');
+    ensureLucideIcons(host);
+  }catch(error){document.getElementById('session-list-status').textContent=error.message||'โหลดรายการอุปกรณ์ไม่สำเร็จ';}
+}
+async function revokeAccountSession(sessionId){
+  if(!SESSION_LIST_TARGET||!confirm('ยกเลิกเซสชันบนอุปกรณ์นี้หรือไม่?'))return;
+  try{
+    const result=await apiPost({action:'sessionRevoke',...SESSION_LIST_TARGET,sessionId},true);
+    if(result.current){logout();return;}
+    await openAccountSessions(SESSION_LIST_TARGET.accountType,SESSION_LIST_TARGET.uid);
+  }catch(error){alert(error.message||'ยกเลิกเซสชันไม่สำเร็จ');}
 }
 
 // ── ADMIN ACCOUNTS (site-only) ──
@@ -2724,7 +3037,8 @@ function renderAdminAccounts(){
   if(!arr.length){ el.innerHTML = '<div class="empty-state">ยังไม่มีบัญชีแอดมิน</div>'; return; }
   el.innerHTML = arr.map(([uid,a])=>{
     const activeMark = (SESSION && SESSION.role==='admin' && String(SESSION.username)===String(a.username)) ? ' <span style="color:var(--text2);font-size:12px">-- กำลังใช้งาน</span>' : '';
-    return `<div class="member-item"><div class="student-avatar" style="width:40px;height:40px;font-size:20px">${avatarEmoji(a)}</div><div class="member-info"><div class="member-name">${a.name||a.username}${activeMark}</div><div class="member-id">บัญชี: ${a.username}</div></div><div class="member-actions"><button class="icon-btn" title="แก้ไขบัญชีแอดมิน" onclick="editAdmin('${uid}')"><i data-lucide="pencil" class="inline-ico"></i></button><button class="icon-btn danger" title="ลบบัญชีแอดมิน" onclick="deleteAdmin('${uid}','${(a.name||'').replace(/'/g,"\'")}')"><i data-lucide="trash-2" class="inline-ico"></i></button></div></div>`;
+    const disabled = a.disabled === true;
+    return `<div class="member-item"><div class="student-avatar" style="width:40px;height:40px;font-size:20px">${avatarEmoji(a)}</div><div class="member-info"><div class="member-name">${escapeHtml(a.name||a.username)}${activeMark}${disabled?' <span class="name-tag" style="color:var(--red)">-- ปิดใช้งาน</span>':''}</div><div class="member-id">บัญชี: ${escapeHtml(a.username)}</div></div><div class="member-actions"><button class="icon-btn" title="แก้ไขบัญชีแอดมิน" onclick="editAdmin('${escapeHtml(uid)}')"><i data-lucide="pencil" class="inline-ico"></i></button><button class="icon-btn" title="${disabled?'เปิดบัญชี':'ปิดบัญชี'}" onclick="toggleAdminDisabled('${escapeHtml(uid)}')"><i data-lucide="${disabled?'user-round-check':'user-round-x'}" class="inline-ico"></i></button><button class="icon-btn" title="ดูอุปกรณ์ที่เคยเข้าสู่ระบบ" onclick="openAccountSessions('admin','${escapeHtml(uid)}')"><i data-lucide="monitor-smartphone" class="inline-ico"></i></button><button class="icon-btn" title="ออกจากระบบทุกอุปกรณ์" onclick="revokeAdminSessions('${escapeHtml(uid)}')"><i data-lucide="log-out" class="inline-ico"></i></button><button class="icon-btn danger" title="ลบบัญชีแอดมิน" onclick="deleteAdmin('${escapeHtml(uid)}')"><i data-lucide="trash-2" class="inline-ico"></i></button></div></div>`;
   }).join('');
   ensureLucideIcons(el);
 }
@@ -2736,18 +3050,31 @@ async function addAdminAccount(){
   const password = (document.getElementById('aa-pass')?.value||'').trim();
   const avatar = (document.getElementById('aa-avatar')?.value||'').trim() || null;
   if(!username || !password) return alert('กรุณากรอก username และ password');
-  const {ref,get,push,set} = FUNS;
-  const snap = await get(ref(DB,'adminAC'));
-  const all = snap.val()||{};
-  for(const [k,v] of Object.entries(all)) if(String(v.username)===String(username)) return alert('มีบัญชีนี้อยู่แล้ว');
-  await set(push(ref(DB,'adminAC')),{ username, name: name||username, password, avatar, createdAt: Date.now() });
-  document.getElementById('aa-username').value=''; document.getElementById('aa-name').value=''; document.getElementById('aa-pass').value=''; document.getElementById('aa-avatar').value='';
+  try{
+    await apiPost({action:'adminCreate',username,name:name||username,password,avatar},true);
+    document.getElementById('aa-username').value='';document.getElementById('aa-name').value='';document.getElementById('aa-pass').value='';document.getElementById('aa-avatar').value='';
+  }catch(error){alert(error.message||'สร้างบัญชีไม่สำเร็จ');}
 }
 
-async function deleteAdmin(uid,name){
+async function deleteAdmin(uid){
+  const name=ADMINS[uid]?.name||ADMINS[uid]?.username||'บัญชีนี้';
   if(!confirm(`ลบบัญชีแอดมิน "${name}" ?`)) return;
   if(!DB) return;
-  const {ref,remove}=FUNS; await remove(ref(DB,`adminAC/${uid}`));
+  try{await apiPost({action:'adminDelete',uid},true);}catch(error){alert(error.message||'ลบบัญชีแอดมินไม่สำเร็จ');}
+}
+async function revokeAdminSessions(uid){
+  const name=ADMINS[uid]?.name||ADMINS[uid]?.username||'บัญชีนี้';
+  if(!confirm(`ออกจากระบบบัญชี “${name}” ในอุปกรณ์ทั้งหมดหรือไม่?`))return;
+  try{await apiPost({action:'adminRevokeSessions',uid},true);alert('ออกจากระบบอุปกรณ์ทั้งหมดแล้ว');if(uid===SESSION?._adminAccountId)logout();}
+  catch(error){alert(error.message||'ยกเลิกเซสชันไม่สำเร็จ');}
+}
+async function toggleAdminDisabled(uid){
+  const account=ADMINS[uid];if(!account)return;
+  const disabled=account.disabled!==true;
+  const name=account.name||account.username||'บัญชีนี้';
+  if(!confirm(`${disabled?'ปิด':'เปิด'}บัญชีแอดมิน “${name}” หรือไม่?${disabled?'\n\nระบบจะออกจากระบบบัญชีนี้ในทุกอุปกรณ์':''}`))return;
+  try{await apiPost({action:'adminSetDisabled',uid,disabled},true);alert(disabled?'ปิดบัญชีแอดมินแล้ว':'เปิดบัญชีแอดมินแล้ว');}
+  catch(error){alert(error.message||'เปลี่ยนสถานะบัญชีไม่สำเร็จ');}
 }
 
 function editAdmin(uid){
@@ -2766,19 +3093,21 @@ async function saveAdminEdit(){
   if(!DB) return alert('ไม่สามารถเชื่อมต่อฐานข้อมูลได้');
   if(!SESSION || SESSION.role !== 'admin') return alert('ต้องเป็นแอดมินในการแก้ไขบัญชี');
   const uid = (document.getElementById('admin-edit-uid')?.value||'').trim();
+  const newUsername = (document.getElementById('admin-edit-username')?.value||'').trim();
   const name = (document.getElementById('admin-edit-name')?.value||'').trim();
   const newPass = (document.getElementById('admin-edit-pass')?.value||'').trim();
   const avatar = (document.getElementById('admin-edit-avatar')?.value||'').trim() || null;
 
-  const payload = { action:'adminUpdate', reqUser: SESSION.username, reqPass: SESSION.password, uid: uid, name: name };
+  if(newPass&&newPass.length<8)return alert('รหัสผ่านใหม่ต้องยาวอย่างน้อย 8 ตัวอักษร');
+  const payload = { action:'adminUpdate', uid: uid, name: name };
+  if(newUsername&&newUsername!==ADMINS[uid]?.username)payload.newUsername=newUsername;
   if(typeof avatar !== 'undefined') payload.avatar = avatar;
   if(newPass) payload.newPass = newPass;
 
   try{
-    const res = await fetch(KCI_API_URL, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(payload) });
-    const data = await res.json();
-    if(!data || !data.success){ alert('ไม่สามารถบันทึกข้อมูลแอดมิน: ' + (data && data.message ? data.message : 'unknown error')); return; }
+    await apiPost(payload,true);
     closeModal('adminEditModal');
+    if(uid===SESSION._adminAccountId&&(newPass||payload.newUsername)){alert('เปลี่ยนข้อมูลเข้าสู่ระบบแล้ว ระบบจะออกจากระบบเพื่อให้เข้าสู่ระบบใหม่');logout();}
   }catch(e){ alert('เกิดข้อผิดพลาด: ' + e.message); }
 }
 
@@ -2880,16 +3209,43 @@ function onAdminStudentDropdownSelect(val) {
   }
 }
 
+function initializeAdminPaymentPeriod(){
+  if(ADMIN_PAYMENT_PERIOD_INITIALIZED)return;
+  const now=new Date();
+  const yearInput=document.getElementById('ap-year');
+  const monthSelect=document.getElementById('ap-month');
+  if(yearInput)yearInput.value=String(getCurrentYear());
+  if(monthSelect)monthSelect.value=String(now.getMonth()+1);
+  ADMIN_PAYMENT_PERIOD_INITIALIZED=true;
+}
+
 function onAdminMonthChange(){
-  // รีเซ็ต ap-week เป็น placeholder เฉพาะเมื่อ dropdown ไม่ได้ถูก focus อยู่
+  initializeAdminPaymentPeriod();
+  const year=parseInt(document.getElementById('ap-year')?.value||getCurrentYear());
+  const month=parseInt(document.getElementById('ap-month')?.value||new Date().getMonth()+1);
+  const periodKey=`${year}_${month}`;
+  const periodChanged=ADMIN_PAYMENT_PERIOD_KEY!==periodKey;
+  const weeks=getAvailableWeeks(year,month);
+  const suggestedWeek=getSuggestedPaymentWeek(year,month);
   const wkDD=document.getElementById('ap-week');
-  if(wkDD && document.activeElement!==wkDD){
-    wkDD.innerHTML='<option value="1">สัปดาห์ที่ 1</option>'; wkDD.value='1';
+  if(wkDD){
+    let week=periodChanged||!ADMIN_PAYMENT_WEEK_MANUAL
+      ?suggestedWeek
+      :parseInt(wkDD.value||suggestedWeek);
+    if(!weeks.includes(week)){
+      week=suggestedWeek;
+      ADMIN_PAYMENT_WEEK_MANUAL=false;
+    }
+    wkDD.innerHTML=weeks.map(w=>`<option value="${w}">สัปดาห์ที่ ${w}</option>`).join('');
+    wkDD.value=String(week);
   }
+  if(periodChanged)ADMIN_PAYMENT_WEEK_MANUAL=false;
+  ADMIN_PAYMENT_PERIOD_KEY=periodKey;
   onAdminWeekChange();
 }
 
-function onAdminWeekChange(){
+function onAdminWeekChange(manualChange=false){
+  if(manualChange)ADMIN_PAYMENT_WEEK_MANUAL=true;
   const year=parseInt(document.getElementById('ap-year')?.value||getCurrentYear());
   const month=parseInt(document.getElementById('ap-month')?.value||1);
   const week=parseInt(document.getElementById('ap-week')?.value||1);
@@ -2902,10 +3258,17 @@ function onAdminWeekChange(){
   resetPaymentDropdown();
 }
 
-function openEditModal(uid){
+async function openEditModal(uid){
   const m=MEMBERS[uid];if(!m)return;
   document.getElementById('edit-uid').value=uid;
   document.getElementById('edit-name').value=m.name||'';
+  document.getElementById('edit-student-id').value=m.studentId||'';
+  const passwordInput=document.getElementById('edit-kci-password');
+  const passwordHelp=document.getElementById('edit-kci-password-help');
+  passwordInput.value='';passwordInput.disabled=true;
+  passwordInput.readOnly=true;
+  passwordInput.autocomplete='off';
+  passwordHelp.textContent='กำลังโหลดข้อมูลรหัสผ่าน…';
   document.getElementById('edit-number').value=m.studentNumber != null ? m.studentNumber : '';
   document.getElementById('edit-tel').value=m.tel||'';
   document.getElementById('edit-room').value=m.classroom||'';
@@ -2913,36 +3276,61 @@ function openEditModal(uid){
   document.getElementById('edit-tag').value = m.tag || '';
   document.getElementById('edit-role').value=m.role||'student';
   openModal('editModal');
+  const loadId=++EDIT_MEMBER_CREDENTIAL_LOAD;
+  try{
+    const result=await apiPost({action:'memberCredentialRead',uid},true);
+    if(loadId!==EDIT_MEMBER_CREDENTIAL_LOAD||document.getElementById('edit-uid').value!==uid)return;
+    const storedId=String(result.credential?.studentId||'');
+    const storedPassword=String(result.credential?.kciPassword||'');
+    if(storedId&&storedId!==String(m.studentId||''))document.getElementById('edit-student-id').value=storedId;
+    passwordInput.value=storedPassword;
+    passwordInput.disabled=false;
+    passwordHelp.textContent=storedPassword?'รหัสผ่านที่บันทึกไว้ในระบบ (อ่านอย่างเดียว)':'ยังไม่มีรหัสผ่านที่บันทึกไว้ในระบบ';
+  }catch(error){
+    if(loadId!==EDIT_MEMBER_CREDENTIAL_LOAD)return;
+    passwordInput.disabled=false;
+    passwordHelp.textContent=`อ่านข้อมูลรหัสผ่านไม่ได้: ${error.message||'กรุณาลองใหม่'}`;
+  }
 }
 
 async function saveMemberEdit(){
   if(!DB)return;
   const uid=document.getElementById('edit-uid').value;
-  const{ref,update}=FUNS;
+  const saveButton=document.querySelector('#editModal .modal-foot .btn-primary');
+  const previousLabel=saveButton?.innerHTML;
+  if(saveButton){saveButton.disabled=true;saveButton.textContent='กำลังตรวจสอบและบันทึก…';}
   const rawNumber=(document.getElementById('edit-number')?.value||'').trim();
   const studentNumber = rawNumber === '' ? null : parseInt(rawNumber,10);
   const classroom=document.getElementById('edit-room').value.trim();
+  const studentId=document.getElementById('edit-student-id').value.trim();
   const payload = {
+    action:'memberUpdate',uid,studentId,studentNumber,
     name: document.getElementById('edit-name').value.trim(),
     tel: document.getElementById('edit-tel').value.trim(),
     classroom,
     role: getEffectiveMemberRole({classroom,role:document.getElementById('edit-role').value}),
-    avatar: (document.getElementById('edit-avatar')?.value||'').trim() || null
+    avatar: (document.getElementById('edit-avatar')?.value||'').trim() || null,
+    tag:(document.getElementById('edit-tag')?.value||'').trim() || null
   };
-  if(studentNumber !== null && !Number.isNaN(studentNumber)) payload.studentNumber = studentNumber;
-  else payload.studentNumber = null;
-  // Only admins may edit tag
-  if(SESSION?.role === 'admin'){
-    const t = (document.getElementById('edit-tag')?.value||'').trim();
-    payload.tag = t || null;
+  try{
+    const result=await apiPost(payload,true);
+    closeModal('editModal');
+    if(result.reauthRequired){
+      alert('อัปเดตรหัสนักเรียนหรือรหัสผ่านของบัญชีผู้ดูแลแล้ว กรุณาเข้าสู่ระบบด้วยข้อมูลใหม่อีกครั้ง');
+      await logout();
+    }
+  }catch(error){
+    alert(error.message||'บันทึกข้อมูลสมาชิกไม่สำเร็จ');
+  }finally{
+    if(saveButton){saveButton.disabled=false;saveButton.innerHTML=previousLabel||'บันทึก';ensureLucideIcons(saveButton);}
   }
-  await update(ref(DB,`members/${uid}`), payload);
-  closeModal('editModal');
 }
 
-async function deleteMember(uid,name){
-  if(!confirm(`ลบ "${name}" ออกจากห้อง 4/2 ?`))return;
-  const{ref,remove}=FUNS;await remove(ref(DB,`members/${uid}`));
+async function deleteMember(uid){
+  const name=String(MEMBERS?.[uid]?.name||uid||'');
+  if(!confirm(`ลบ "${name}" ออกจากห้อง 4/2 หรือไม่?\n\nระบบจะปิดการเข้าสู่ระบบและออกจากระบบทุกอุปกรณ์ ประวัติการเงินเดิมจะยังคงอยู่`))return;
+  try{await apiPost({action:'memberDelete',uid},true);}
+  catch(error){alert(error.message||'ลบสมาชิกไม่สำเร็จ');}
 }
 
 /* ── WALLET CONFIG EDITOR ── */
@@ -3298,6 +3686,149 @@ function summaryCellHtml(amt, fee){
   return `<td class="rsm-cell rsm-unpaid" title="ยังไม่จ่าย 0/${fee}฿">–</td>`;
 }
 
+function summaryDraftKey(studentId, year, month, week){
+  return JSON.stringify([String(studentId),Number(year),Number(month),Number(week)]);
+}
+
+function summaryAdjustmentId(studentId, year, month, week){
+  const safeStudentId=encodeURIComponent(String(studentId)).replace(/\./g,'%2E');
+  return `rsmAdj_${year}_${month}_${week}_${safeStudentId}`;
+}
+
+function updateAdminRoomSummaryDraft(input){
+  if(!ADMIN_RSM_EDITING||!input)return;
+  const raw=input.value.trim();
+  const amount=raw===''?0:Number(raw);
+  if(!Number.isFinite(amount)||amount<0)return;
+  const cell=input.closest('td');
+  if(cell){
+    cell.classList.remove('rsm-paid','rsm-partial','rsm-unpaid');
+    const fee=Number(input.dataset.rsmFee)||0;
+    cell.classList.add(fee>0&&amount>=fee?'rsm-paid':amount>0?'rsm-partial':'rsm-unpaid');
+  }
+  const studentId=decodeURIComponent(input.dataset.rsmStudent||'');
+  const year=Number(input.dataset.rsmYear), month=Number(input.dataset.rsmMonth), week=Number(input.dataset.rsmWeek);
+  const key=summaryDraftKey(studentId,year,month,week);
+  const originalAmount=ADMIN_RSM_DRAFT[key]?.originalAmount??Number(input.dataset.rsmOriginalAmount||0);
+  ADMIN_RSM_DRAFT[key]={studentId,year,month,week,amount:Math.round(amount*100)/100,originalAmount};
+}
+
+function setAdminRoomSummaryEditButton(){
+  const btn=document.getElementById('admin-rsm-edit-btn');
+  if(!btn)return;
+  btn.disabled=_adminRsmSaving;
+  if(_adminRsmSaving){
+    btn.innerHTML='<span class="spinner"></span> กำลังบันทึก';
+  }else if(ADMIN_RSM_EDITING){
+    btn.innerHTML='<i data-lucide="save" class="btn-ico"></i> บันทึก';
+  }else{
+    btn.innerHTML='<i data-lucide="pencil" class="btn-ico"></i> เปิดการแก้ไข';
+  }
+  ensureLucideIcons(btn);
+}
+
+function renderSummaryEditCell(studentId, year, month, week, amount, fee){
+  const key=summaryDraftKey(studentId,year,month,week);
+  const draft=Object.prototype.hasOwnProperty.call(ADMIN_RSM_DRAFT,key)
+    ?ADMIN_RSM_DRAFT[key].amount:amount;
+  const safeStudentId=encodeURIComponent(String(studentId));
+  const value=Number.isFinite(Number(draft))?String(Number(draft)):'';
+  const statusClass=fee>0&&amount>=fee?'rsm-paid':amount>0?'rsm-partial':'rsm-unpaid';
+  return `<td class="rsm-cell rsm-edit-cell ${statusClass}"><input class="rsm-edit-input" type="number" min="0" step="any" inputmode="decimal" aria-label="จำนวนเงินนักเรียนรหัส ${safeStudentId} สัปดาห์ที่ ${week}" value="${value}" data-rsm-original-amount="${Number(amount)||0}" data-rsm-fee="${Number(fee)||0}" data-rsm-student="${safeStudentId}" data-rsm-year="${year}" data-rsm-month="${month}" data-rsm-week="${week}" oninput="updateAdminRoomSummaryDraft(this)"></td>`;
+}
+
+async function toggleAdminRoomSummaryEdit(){
+  if(SESSION?.role!=='admin')return;
+  if(_adminRsmSaving)return;
+  if(!ADMIN_RSM_EDITING){
+    if(!DB||!FUNS){alert('ระบบฐานข้อมูลยังไม่พร้อม');return;}
+    ADMIN_RSM_EDITING=true;
+    ADMIN_RSM_DRAFT={};
+    setAdminRoomSummaryEditButton();
+    renderAdminRoomSummaryPreview();
+    return;
+  }
+  await saveAdminRoomSummaryEdits();
+}
+
+async function saveAdminRoomSummaryEdits(){
+  if(!DB||SESSION?.role!=='admin')return;
+  const inputs=Array.from(document.querySelectorAll('#admin-rsm-body .rsm-edit-input'));
+  for(const input of inputs){
+    const raw=input.value.trim();
+    const amount=raw===''?0:Number(raw);
+    if(!Number.isFinite(amount)||amount<0){
+      input.focus();
+      alert('กรุณากรอกจำนวนเงินเป็นตัวเลขตั้งแต่ 0 ขึ้นไป');
+      return;
+    }
+    updateAdminRoomSummaryDraft(input);
+  }
+
+  const drafts=Object.values(ADMIN_RSM_DRAFT).filter(draft=>Math.abs(draft.amount-draft.originalAmount)>=0.005);
+  if(!drafts.length){
+    ADMIN_RSM_EDITING=false;
+    setAdminRoomSummaryEditButton();
+    renderAdminRoomSummaryPreview();
+    return;
+  }
+
+  const updates={};
+  drafts.forEach(draft=>{
+    let originalTotal=0;
+    Object.values(PAYMENTS||{}).forEach(payment=>{
+      if(!payment||payment.summaryAdjustment)return;
+      if(String(payment.studentId)!==String(draft.studentId))return;
+      if(String(payment.year||getCurrentYear())!==String(draft.year))return;
+      if(String(payment.month)!==String(draft.month)||String(payment.week)!==String(draft.week))return;
+      const amount=Number.parseFloat(String(payment.amount??0).replace(/[\s,]/g,''));
+      if(Number.isFinite(amount))originalTotal+=amount;
+    });
+    const adjustment=Math.round((draft.amount-originalTotal)*100)/100;
+    const id=summaryAdjustmentId(draft.studentId,draft.year,draft.month,draft.week);
+    updates[id]=Math.abs(adjustment)<0.005?null:{
+      studentId:String(draft.studentId),
+      studentName:Object.values(MEMBERS||{}).find(m=>String(m.studentId)===String(draft.studentId))?.name||String(draft.studentId),
+      year:draft.year,month:draft.month,week:draft.week,
+      amount:adjustment,
+      note:'ปรับยอดจากตารางสรุปเงินห้อง',
+      by:SESSION.name||SESSION.username,
+      ts:Date.now(),
+      summaryAdjustment:true
+    };
+  });
+
+  _adminRsmSaving=true;
+  setAdminRoomSummaryEditButton();
+  try{
+    const{ref,update}=FUNS;
+    await update(ref(DB,'payments'),updates);
+    Object.entries(updates).forEach(([id,payment])=>{
+      if(payment===null)delete PAYMENTS[id];
+      else PAYMENTS[id]=payment;
+    });
+    ADMIN_RSM_EDITING=false;
+    ADMIN_RSM_DRAFT={};
+    if(CUR_PAGE==='pay')renderPayment();
+    if(isAdminPanelActive('ap-payment')){
+      schedulePayHistoryAdminRender();
+      scheduleAdminRoomSummaryPreview();
+    }
+    if(isAdminPanelActive('ap-finance'))renderFinanceSummary();
+    if(CUR_PAGE==='home'){
+      updateAdminHomeDashboard();
+      updateStudentHomeDashboard();
+    }
+    renderAdminRoomSummaryPreview();
+  }catch(error){
+    console.error('save room summary edits failed',error);
+    alert('บันทึกยอดเงินห้องไม่สำเร็จ กรุณาลองอีกครั้ง');
+  }finally{
+    _adminRsmSaving=false;
+    setAdminRoomSummaryEditButton();
+  }
+}
+
 function renderAdminRoomSummaryMonthOptions(){
   const list=document.getElementById('admin-rsm-months');
   const picker=document.getElementById('admin-rsm-months-picker');
@@ -3377,6 +3908,8 @@ function renderAdminRoomSummaryPreview(){
   const barEl=document.getElementById('admin-rsm-totalbar');
   if(!el) return;
 
+  setAdminRoomSummaryEditButton();
+
   renderAdminRoomSummaryMonthOptions();
 
   const year=getCurrentYear();
@@ -3389,6 +3922,7 @@ function renderAdminRoomSummaryPreview(){
 
 function renderRoomSummaryContent(el, barEl, year, months, roomFilter, viewMode){
   if(!el)return;
+  const canEdit=el.id==='admin-rsm-body'&&ADMIN_RSM_EDITING;
 
   let mbs=Object.values(MEMBERS).sort(compareMembersByOrder);
   if(roomFilter) mbs=mbs.filter(m=>String(m.classroom||'')===roomFilter);
@@ -3444,7 +3978,9 @@ function renderRoomSummaryContent(el, barEl, year, months, roomFilter, viewMode)
     visibleCols.forEach(c=>{
       const key=`${c.year}_${c.month}_${c.week}`;
       const amt=(paidMap[String(m.studentId)]||{})[key]||0;
-      rows+=summaryCellHtml(amt, c.fee);
+      rows+=canEdit
+        ?renderSummaryEditCell(m.studentId,c.year,c.month,c.week,amt,c.fee)
+        :summaryCellHtml(amt, c.fee);
     });
     rows+=`<td class="rsm-td-total ${outstanding>0?'rsm-owe':'rsm-clear'}">${outstanding>0?outstanding.toLocaleString('th-TH')+'฿':'✓'}</td></tr>`;
   });
@@ -3486,7 +4022,7 @@ function renderPayHistoryAdmin(){
     const actorName = actor ? (actor.name || actor.username || by) : (by || p.by || '—');
     const timestamp=Number(p.ts);
     const timeStr = Number.isFinite(timestamp)&&timestamp>0 ? formatter.format(new Date(timestamp)) : '—';
-    return `<div class="history-item"><div class="history-icon in">${actorAvatar}</div><div class="history-info"><div class="history-title">${escapeHtml((p.studentName||p.studentId||''))} · ส.${p.week} ${MONTHS[(p.month||1)-1]} ${p.year||getCurrentYear()}</div><div class="history-sub">${timeStr}${p.note?' · '+escapeHtml(p.note):''} · บันทึกโดย ${escapeHtml(actorName)}</div></div><div style="display:flex;align-items:center;gap:6px"><div class="history-amt in">+${p.amount}฿</div><button class="icon-btn" title="แก้ไขจำนวนเงิน" style="width:32px;height:32px;font-size:13px;flex-shrink:0;color:var(--accent);border-color:var(--accent)" onclick="openEditPaymentModal('${id}')">${svgIco('edit')}</button><button class="icon-btn danger" title="ลบรายการนี้" style="width:32px;height:32px;font-size:14px;flex-shrink:0" onclick="deletePayment('${id}')">${svgIco('trash-2')}</button></div></div>`;
+    return `<div class="history-item"><div class="history-icon in">${actorAvatar}</div><div class="history-info"><div class="history-title">${escapeHtml((p.studentName||p.studentId||''))}${p.summaryAdjustment?' · ปรับยอด':''} · ส.${p.week} ${MONTHS[(p.month||1)-1]} ${p.year||getCurrentYear()}</div><div class="history-sub">${timeStr}${p.note?' · '+escapeHtml(p.note):''} · บันทึกโดย ${escapeHtml(actorName)}</div></div><div style="display:flex;align-items:center;gap:6px"><div class="history-amt" style="color:${paymentMovementColor(p)}">${formatPaymentMovement(p)}</div><button class="icon-btn" title="แก้ไขจำนวนเงิน" style="width:32px;height:32px;font-size:13px;flex-shrink:0;color:var(--accent);border-color:var(--accent)" onclick="openEditPaymentModal('${id}')">${svgIco('edit')}</button><button class="icon-btn danger" title="ลบรายการนี้" style="width:32px;height:32px;font-size:14px;flex-shrink:0" onclick="deletePayment('${id}')">${svgIco('trash-2')}</button></div></div>`;
   }).join('');
   const remaining=arr.length-visible.length;
   const more=remaining>0
@@ -3815,26 +4351,80 @@ async function removeAutoRoleRule(room){
   }
 }
 
+function getRolePermissions(role=SESSION?.role){
+  const normalized=String(role||'guest').toLowerCase();
+  if(normalized==='admin')return{class:true,personalData:true,pay:true,history:true};
+  const key=normalized==='student'?'student':'guest';
+  const defaults=DEFAULT_ROLE_PERMISSIONS[key];
+  const saved=PERMS?.rolePermissions?.[key];
+  if(saved&&typeof saved==='object')return{...defaults,...saved};
+  // รองรับค่า Guest แบบเดิมที่บันทึกไว้ก่อนแยกสิทธิ์ตามยศ
+  if(key==='guest')return{...defaults,class:!!PERMS.class,pay:!!PERMS.pay,history:!!PERMS.history};
+  return{...defaults};
+}
+
+function hasRolePermission(permission,role=SESSION?.role){
+  const normalized=String(role||'guest').toLowerCase();
+  if(normalized==='admin'||SESSION?._isAdminAC===true)return true;
+  return getRolePermissions(normalized)[permission]===true;
+}
+
 function applyPermsUI(){
+  const roleSelect=document.getElementById('perm-role-select');
+  const role=roleSelect?.value||PERMS_ROLE||'guest';
+  PERMS_ROLE=role;
+  const rolePerms=getRolePermissions(role);
   const pc=document.getElementById('perm-class');
+  const ppd=document.getElementById('perm-personal-data');
   const pp=document.getElementById('perm-pay');
   const ph=document.getElementById('perm-history');
-  if(pc)pc.checked=!!PERMS.class;
-  if(pp)pp.checked=!!PERMS.pay;
-  if(ph)ph.checked=!!PERMS.history;
+  if(pc)pc.checked=!!rolePerms.class;
+  if(ppd)ppd.checked=!!rolePerms.personalData;
+  if(pp)pp.checked=!!rolePerms.pay;
+  if(ph)ph.checked=!!rolePerms.history;
   renderAutoRoleRules();
   if(SESSION){
     if(CUR_PAGE==='class')renderClassmates();
     if(CUR_PAGE==='pay')renderPayment();
     if(CUR_PAGE==='home'&&SESSION.role!=='admin')updateStudentHomeDashboard();
+    if(document.getElementById('historyModal')?.classList.contains('open'))renderHistory();
+    if(SESSION._isAdminAC===true||!hasRolePermission('class'))clearClassDirectory();
+    else loadClassDirectory();
+    if(SESSION._isAdminAC===true||!hasRolePermission('pay'))clearPaymentDirectory();
+    else if(CUR_PAGE==='pay'){startPaymentDirectoryRefresh();loadPaymentDirectory();}
   }
 }
 
 async function savePerms(){
   if(!DB)return;
   const{ref,set}=FUNS;
-  PERMS={...PERMS,class:document.getElementById('perm-class').checked,pay:document.getElementById('perm-pay').checked,history:document.getElementById('perm-history').checked};
-  await set(ref(DB,'settings/perms'),PERMS);
+  const role=document.getElementById('perm-role-select')?.value==='student'?'student':'guest';
+  const rolePermissions={
+    ...(PERMS.rolePermissions||{}),
+    guest:getRolePermissions('guest'),
+    student:getRolePermissions('student')
+  };
+  rolePermissions[role]={
+    class:!!document.getElementById('perm-class')?.checked,
+    personalData:!!document.getElementById('perm-personal-data')?.checked,
+    pay:!!document.getElementById('perm-pay')?.checked,
+    history:!!document.getElementById('perm-history')?.checked
+  };
+  const nextPerms={...PERMS,rolePermissions,
+    // เขียนค่าชุด Guest ไว้ด้วยเพื่อให้หน้าเว็บรุ่นเก่ายังอ่านค่าได้
+    class:rolePermissions.guest.class,pay:rolePermissions.guest.pay,history:rolePermissions.guest.history
+  };
+  const previousPerms=PERMS;
+  PERMS=nextPerms;
+  applyPermsUI();
+  try{
+    await set(ref(DB,'settings/perms'),nextPerms);
+  }catch(error){
+    PERMS=previousPerms;
+    applyPermsUI();
+    console.error('save role permissions failed',error);
+    alert('บันทึกสิทธิ์ไม่สำเร็จ กรุณาตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง');
+  }
 }
 
 function toggleProfile(){document.getElementById('profilePanel').classList.toggle('open');}
@@ -3874,12 +4464,7 @@ async function saveProfileAvatar(){
   const v = document.getElementById('pp-avatar-input')?.value?.trim() || '';
   if(!v) return alert('กรุณาใส่อิโมจิ');
   const emoji = Array.from(v)[0] || v[0];
-  // find member uid by studentId
-  let uid = null;
-  for(const [id,m] of Object.entries(MEMBERS||{})){
-    if(String(m.studentId)===String(SESSION.username)){ uid = id; break; }
-  }
-  if(!uid || !DB){
+  if(!DB){
     // update session locally
     SESSION.avatar = emoji;
     localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
@@ -3888,8 +4473,7 @@ async function saveProfileAvatar(){
     return;
   }
   try{
-    const {ref,update} = FUNS;
-    await update(ref(DB,`members/${uid}`),{ avatar: emoji });
+    await apiPost({action:'studentAvatar',avatar:emoji},true);
     SESSION.avatar = emoji;
     localStorage.setItem('42hub_sess',JSON.stringify(SESSION));
     updateProfilePanel();
@@ -3901,6 +4485,7 @@ function goPage(pg){
   if(pg==='admin'&&SESSION?.role!=='admin') pg='home';
   document.getElementById('profilePanel').classList.remove('open');
   if(pg===CUR_PAGE) return;
+  if(CUR_PAGE==='pay'&&_paymentDirectoryRefreshTimer){clearInterval(_paymentDirectoryRefreshTimer);_paymentDirectoryRefreshTimer=null;}
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   document.getElementById(`page-${pg}`).classList.add('active');
@@ -3913,9 +4498,12 @@ function goPage(pg){
       updateRoomFilters();
       renderClassmates();
     }
-    if(pg==='pay') renderPayment();
+    if(pg==='pay'){
+      renderPayment();
+      if(SESSION?._isAdminAC!==true&&hasRolePermission('pay'))loadPaymentDirectory(true);
+    }
     if(pg==='admin'){
-      const tabs=['members','payment','finance','walletcfg','perms','admins','cmd'];
+      const tabs=['members','payment','finance','walletcfg','perms','admins','cmd','storage'];
       const activeIndex=Array.from(document.querySelectorAll('.admin-tabs .admin-tab')).findIndex(b=>b.classList.contains('active'));
       switchAdminTab(tabs[activeIndex>=0?activeIndex:0]);
     }
@@ -3931,6 +4519,10 @@ function goPage(pg){
 async function exportRoomSummaryImage(targetId, fileName){
   const target=document.getElementById(targetId);
   if(!target){ alert('ไม่พบพื้นที่สรุปเงินห้องสำหรับส่งออก'); return; }
+  if(targetId==='admin-rsm-export-shell'&&ADMIN_RSM_EDITING){
+    alert('กรุณาบันทึกยอดเงินห้องก่อนส่งออก PNG');
+    return;
+  }
   const sourceTable=target.querySelector('.rsm-table');
   const sourceTotalbar=target.querySelector('.rsm-totalbar');
   const btn=document.querySelector(`.room-summary-export-btn[onclick*="${targetId}"]`);
@@ -4086,6 +4678,11 @@ async function exportRoomSummaryImage(targetId, fileName){
 function openModal(id){document.getElementById(id).classList.add('open');document.body.style.overflow='hidden';}
 function closeModal(id,e){
   if(e&&e.target!==document.getElementById(id))return;
+  if(id==='editModal'){
+    EDIT_MEMBER_CREDENTIAL_LOAD++;
+    const passwordInput=document.getElementById('edit-kci-password');
+    if(passwordInput){passwordInput.value='';}
+  }
   document.getElementById(id).classList.remove('open');document.body.style.overflow='';
 }
 
@@ -4226,8 +4823,8 @@ async function runDbCommand(){
       termLog('info','  addadmin [u] [p] [n]→ สร้างบัญชีแอดมิน');
       termLog('info','🗄️  ฐานข้อมูล:');
       termLog('info','  get [path]          → ดูข้อมูลดิบ (members/payments/settings)');
-      termLog('info','  get perms           → ดูสิทธิ์ Guest');
-      termLog('info','  reset perms         → รีเซ็ตสิทธิ์ Guest ทั้งหมดเป็น false');
+      termLog('info','  get perms           → ดูสิทธิ์ตามยศ');
+      termLog('info','  reset perms         → รีเซ็ตสิทธิ์ Guest และ Student เป็น false');
       termLog('info','  delete [path/id]    → ลบข้อมูล');
       termLog('info','  clear payments      → ลบประวัติเงินทั้งหมด (ยืนยัน)');
       termLog('info','📤 Export:');
@@ -4255,7 +4852,7 @@ async function runDbCommand(){
     if(cmd==='stats'){
       const mSnap=await get(ref(DB,'members'));
       const pSnap=await get(ref(DB,'payments'));
-      const aSnap=await get(ref(DB,'adminAC'));
+      const aSnap=await get(ref(DB,'adminProfiles'));
       const members=mSnap.val()||{};
       const payments=pSnap.val()||{};
       const admins=aSnap.val()||{};
@@ -4298,7 +4895,7 @@ async function runDbCommand(){
 
     /* ── LIST ADMINS ── */
     if(cmd==='list'&&parts[1]==='admins'){
-      const snap=await get(ref(DB,'adminAC'));
+      const snap=await get(ref(DB,'adminProfiles'));
       const all=snap.val()||{};
       const arr=Object.entries(all);
       if(!arr.length){termLog('info','ยังไม่มีบัญชีแอดมิน');return;}
@@ -4407,6 +5004,7 @@ async function runDbCommand(){
     if(cmd==='get'){
       const path=parts[1];
       if(!path){termLog('err','รูปแบบ: get [path]');return;}
+      if(/^(adminAC|studentCredentials|system|auditLog)(\/|$)/.test(path)){termLog('err','เส้นทางนี้เข้าถึงได้ผ่าน API ฝั่งเซิร์ฟเวอร์เท่านั้น');return;}
       const snap=await get(ref(DB,path));
       termLog('ok', JSON.stringify(snap.val(), null, 2));
       return;
@@ -4414,9 +5012,10 @@ async function runDbCommand(){
 
     /* ── RESET PERMS ── */
     if(cmd==='reset'&&parts[1]==='perms'){
-      if(!confirm('รีเซ็ตสิทธิ์ Guest ทั้งหมดเป็น false?'))return;
-      await set(ref(DB,'settings/perms'),{...PERMS,class:false,pay:false,history:false});
-      termLog('ok','รีเซ็ตสิทธิ์ Guest เรียบร้อย (ทุกอย่างปิดหมด)');
+      if(!confirm('รีเซ็ตสิทธิ์ Guest และ Student ทั้งหมดเป็น false?'))return;
+      const rolePermissions={guest:{class:false,pay:false,history:false},student:{class:false,pay:false,history:false}};
+      await set(ref(DB,'settings/perms'),{...PERMS,class:false,pay:false,history:false,rolePermissions});
+      termLog('ok','รีเซ็ตสิทธิ์ Guest และ Student เรียบร้อย (ทุกอย่างปิดหมด)');
       return;
     }
 
@@ -4424,6 +5023,7 @@ async function runDbCommand(){
     if(cmd==='delete'){
       const path=parts[1];
       if(!path){termLog('err','รูปแบบ: delete [path/id] เช่น delete members/abc123');return;}
+      if(/^(adminAC|studentCredentials|system|auditLog)(\/|$)/.test(path)){termLog('err','เส้นทางนี้ไม่อนุญาตให้ลบจาก Terminal');return;}
       if(!confirm(`ยืนยันลบ: ${path} ?`))return;
       await remove(ref(DB,path));
       termLog('ok',`ลบ ${path} เรียบร้อย`);
@@ -4444,10 +5044,7 @@ async function runDbCommand(){
     if(cmd==='addadmin'){
       const username=parts[1]; const password=parts[2]; const name=parts.slice(3).join(' ')||username;
       if(!username||!password){termLog('err','รูปแบบ: addadmin [username] [password] [name]');return;}
-      const snap=await get(ref(DB,'adminAC'));
-      const all=snap.val()||{};
-      for(const [,v] of Object.entries(all)) if(String(v.username)===String(username)){termLog('err','บัญชีนี้มีอยู่แล้ว');return;}
-      await set(push(ref(DB,'adminAC')),{username,password,name,createdAt:Date.now()});
+      await apiPost({action:'adminCreate',username,password,name},true);
       termLog('ok',`สร้างบัญชีแอดมิน "${username}" (${name}) เรียบร้อย`);
       return;
     }
@@ -4456,7 +5053,8 @@ async function runDbCommand(){
     if(cmd==='export'){
       if(parts[1]==='members'){
         const snap=await get(ref(DB,'members'));
-        const data=JSON.stringify(snap.val()||{},null,2);
+        const safeMembers=Object.fromEntries(Object.entries(snap.val()||{}).map(([id,member])=>{const copy={...member};delete copy.lastPassword;return[id,copy];}));
+        const data=JSON.stringify(safeMembers,null,2);
         termLog('ok','=== MEMBERS JSON ===');
         termLog('ok',data);
         return;
